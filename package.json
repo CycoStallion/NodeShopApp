@@ -1,0 +1,24 @@
+{
+  "name": "nodeshopapplication",
+  "version": "1.0.0",
+  "description": "This is a sample application created with NodeJs",
+  "main": "app.js",
+  "scripts": {
+    "test": "echo \"Error: no test specified\" && exit 1",
+    "start": "nodemon app.js"
+  },
+  "repository": {
+    "type": "git",
+    "url": "git+https://github.com/CycoStallion/NodeShopApp.git"
+  },
+  "author": "Shantanu Kamath",
+  "license": "MIT",
+  "bugs": {
+    "url": "https://github.com/CycoStallion/NodeShopApp/issues"
+  },
+  "homepage": "https://github.com/CycoStallion/NodeShopApp#readme",
+  "devDependencies": {
+    "express": "^4.17.1",
+    "nodemon": "^2.0.4"
+  }
+}
