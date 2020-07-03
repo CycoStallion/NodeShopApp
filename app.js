@@ -1,4 +1,3 @@
-const http = require('http');
 const express = require('express');
 
 const app = express();
@@ -14,8 +13,5 @@ app.use((req, res, next) => {
     res.send('<h1>Hello from Express JS</h1>');
 });
 
-//Create an http server to serve requests
-const server = http.createServer(app);
-
-//Listen to incoming requests
-server.listen(3000);
+//Using express -> app.listen, which means we wont require 'http' any more
+app.listen(3000);
