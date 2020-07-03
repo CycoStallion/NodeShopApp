@@ -15,10 +15,15 @@ app.use((req, res, next) => {
 });
 
 //Route for /product-page
-app.use('/product', (req, res, next) => {
+app.use('/product-page', (req, res, next) => {
     console.log(req.body); //Will show undefined w/o body parser
-    res.send('<h1>This is the product page</h1>');
+    res.redirect("/");
 });
+
+app.post("/product", (req, res, next) => {
+    console.log(req.body);
+    res.send("<h1>This is the products page</h1>");
+})
 
 app.use('/add-product', (req, res, next) => {
     res.send('<form action="/product" method="POST"><input type="text" name="title"><button type="submit">Post</button></form>');
