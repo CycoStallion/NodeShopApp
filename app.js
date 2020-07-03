@@ -1,5 +1,4 @@
 const express = require('express');
-const { reset } = require('nodemon');
 const bodyParser = require('body-parser');
 
 const app = express();
@@ -20,6 +19,7 @@ app.use('/product-page', (req, res, next) => {
     res.redirect("/");
 });
 
+//Only hanlde post request here
 app.post("/product", (req, res, next) => {
     console.log(req.body);
     res.send("<h1>This is the products page</h1>");
