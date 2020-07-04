@@ -8,7 +8,8 @@ router.get("/", (req, res, next) => {
     console.log("In shop route");
     // res.send('<h1>Hello from Express JS</h1>');
     console.log('Stored products on variable: ', products);
-    res.sendFile(path.join(__dirname, '../', 'views', 'shop.html'));
+    // res.sendFile(path.join(__dirname, '../', 'views', 'shop.html'));
+    res.render('shop', {products, docTitle:'Shop'}); //Render the shop view. Its path and format is already mentioned in the app.js configuration
 });
 
 module.exports = router;

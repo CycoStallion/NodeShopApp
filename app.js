@@ -11,6 +11,10 @@ const shopRoutes = require('./routes/shop');
 app.use(bodyParser.urlencoded({extended: true}));
 app.use(express.static(path.join(__dirname, 'public')));
 
+//Defining the view engine for express and explicitly mention the views folder to be used
+app.set('view engine', 'pug');
+app.set('views', 'views');
+
 //Load Routes
 app.use('/admin', adminRoutes.router);
 app.use(shopRoutes);
