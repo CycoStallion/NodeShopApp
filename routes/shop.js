@@ -9,7 +9,7 @@ router.get("/", (req, res, next) => {
     // res.send('<h1>Hello from Express JS</h1>');
     console.log('Stored products on variable: ', products);
     // res.sendFile(path.join(__dirname, '../', 'views', 'shop.html'));
-    res.render('shop', {products, pageTitle:'Shop'}); //Render the shop view. Its path and format is already mentioned in the app.js configuration
+    res.render('shop', {products, pageTitle:'Shop', activePath: "/"}); //Render the shop view. Its path and format is already mentioned in the app.js configuration
 });
 
 module.exports = router;

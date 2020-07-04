@@ -17,7 +17,7 @@ router.get('/product-page', (req, res, next) => {
 router.get('/add-product', (req, res, next) => {
     // res.send('<form action="/admin/product" method="POST"><input type="text" name="title"><button type="submit">Post</button></form>');
     // res.sendFile(path.join(__dirname, '../', 'views', 'add-product.html'));
-    res.render('add-product', {pageTitle:'Add Product'});
+    res.render('add-product', {pageTitle:'Add Product', activePath: "/admin/add-product"});
 });
 
 //Only handle post request here
