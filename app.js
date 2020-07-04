@@ -12,7 +12,7 @@ app.use(bodyParser.urlencoded({extended: true}));
 app.use(express.static(path.join(__dirname, 'public')));
 
 //Load Routes
-app.use('/admin', adminRoutes);
+app.use('/admin', adminRoutes.router);
 app.use(shopRoutes);
 
 //Custom Middleware
