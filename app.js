@@ -17,7 +17,7 @@ app.use(shopRoutes);
 
 //Custom Middleware
 app.use((req, res, next) => {
-    console.log("In the middleware");
+    console.log("Nothing matched - Heading to 404");
     console.log(req.url, req.method, req.params);
     next(); //Allows the request to continue to the next middleware
 });
