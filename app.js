@@ -12,8 +12,14 @@ app.use(bodyParser.urlencoded({extended: true}));
 app.use(express.static(path.join(__dirname, 'public')));
 
 //Defining the view engine for express and explicitly mention the views folder to be used
+/* //For pug
 app.set('view engine', 'pug');
 app.set('views', path.join(__dirname, 'views', 'pug'));
+*/
+
+app.set('view engine', 'ejs');
+app.set('views', path.join(__dirname, 'views', 'ejs'));
+
 
 //Load Routes
 app.use('/admin', adminRoutes.router);
