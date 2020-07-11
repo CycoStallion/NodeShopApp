@@ -22,7 +22,7 @@ app.set('views', path.join(__dirname, 'views', 'ejs'));
 
 
 //Load Routes
-app.use('/admin', adminRoutes.router);
+app.use('/admin', adminRoutes);
 app.use(shopRoutes);
 
 //Custom Middleware
