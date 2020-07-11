@@ -4,8 +4,6 @@ const express = require('express');
 const router = express.Router();
 
 const {getAddProducts, postAddProducts} = require('../controllers/productController');
-const { route } = require('./shop');
-
 
 //GET  /admin/product-page
 router.get('/product-page', (req, res, next) => {
