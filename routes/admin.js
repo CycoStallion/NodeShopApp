@@ -3,9 +3,7 @@ const express = require('express');
 
 const router = express.Router();
 
-//This variable will be available on the Node application running on the server and will be available to all requests
-//When edited by one, the updates will be seen by other requests
-const products = []; 
+const {getAddProducts, postAddProducts} = require('../controllers/productController');
 
 //GET  /admin/product-page
 router.get('/product-page', (req, res, next) => {
@@ -14,22 +12,11 @@ router.get('/product-page', (req, res, next) => {
 });
 
 //GET /admin/add-product
-router.get('/add-product', (req, res, next) => {
-    // res.send('<form action="/admin/product" method="POST"><input type="text" name="title"><button type="submit">Post</button></form>');
-    // res.sendFile(path.join(__dirname, '../', 'views', 'add-product.html'));
-    res.render('add-product', {pageTitle:'Add Product', activePath: "/admin/add-product"});
-});
+router.get('/add-product', getAddProducts);
 
 //Only handle post request here
 //POST /admin/add-product
-router.post("/add-product", (req, res, next) => {
-    console.log(req.body);
-    products.push(req.body.title);
-    res.redirect("/");
-});
+router.post("/add-product", postAddProducts);
 
 
-module.exports ={
-    router,
-    products
-}
+module.exports = router
