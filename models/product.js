@@ -1,7 +1,10 @@
 const fs = require('fs');
 const path = require('path');
+const crypto = require("crypto");
 
 const filePath = path.join(__dirname, '../', 'data', 'products.json');
+
+const id = crypto.randomBytes(16).toString("hex");
 
 const getAllProductsFromFile = (callback) => {
     fs.readFile(filePath, (err, fileData) => {
@@ -27,14 +30,8 @@ class Product{
     save(){
         getAllProductsFromFile((products) => {
             //Add new product 
-            let newProduct = {
-                title: this.title,
-                imageUrl: this.imageUrl,
-                description: this.description,
-                price: this.price
-            };
-
-            products.push(newProduct);
+            this.id = id;
+            products.push(this);
 
             //Write back to file with new data
             fs.writeFile(filePath, JSON.stringify(products), (err) => {
