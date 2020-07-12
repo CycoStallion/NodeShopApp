@@ -12,6 +12,19 @@ getProducts = (req, res, next) => {
     
 };
 
+getProductDetails = (req, res, next) => {
+    const productId = req.params.productId;
+    Product.findById(productId, (foundProduct) => {
+        res.render('shop/product-details', {
+            foundProduct,
+            pageTitle:'All Products', 
+            activePath: "/products"
+        }); //Render the products view. Its path and format is already mentioned in the app.js configuration
+    });
+   
+    
+};
+
 getIndex = (req, res, next) => {
     Product.fetchAll((products) => {
         res.render('shop/index', {
@@ -45,6 +58,7 @@ getOrders = (req, res, next) => {
 
 module.exports = {
     getProducts,
+    getProductDetails,
     getIndex,
     getCart,
     getCheckout,
