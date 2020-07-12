@@ -6,14 +6,14 @@
 <%- include('../includes/content.ejs') %>
 
     <main class="centered">
-        <% if(foundProduct !== undefined) { %>
-            <h1><%= foundProduct.title %></h1>
+        <% if(product !== undefined) { %>
+            <h1><%= product.title %></h1>
             <hr />
             <div>
-                <img src="<%= foundProduct.imageUrl %>" alt="<%= foundProduct.title %>">
+                <img src="<%= product.imageUrl %>" alt="<%= product.title %>">
             </div>
-            <h2><%= foundProduct.price %></h2>
-            <p><%= foundProduct.description %></p>
+            <h2><%= product.price %></h2>
+            <p><%= product.description %></p>
         <% } else { %>
             <h1>Product Not found</h1>
         <% } %>

@@ -14,15 +14,13 @@ getProducts = (req, res, next) => {
 
 getProductDetails = (req, res, next) => {
     const productId = req.params.productId;
-    Product.findById(productId, (foundProduct) => {
+    Product.findById(productId, (product) => {
         res.render('shop/product-details', {
-            foundProduct,
-            pageTitle:'All Products', 
+            product,
+            pageTitle:product.title, 
             activePath: "/products"
         }); //Render the products view. Its path and format is already mentioned in the app.js configuration
-    });
-   
-    
+    });    
 };
 
 getIndex = (req, res, next) => {
