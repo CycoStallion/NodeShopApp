@@ -13,19 +13,20 @@ getProducts = (req, res, next) => {
 };
 
 getAddProduct = (req, res, next) => {
-    // res.send('<form action="/admin/product" method="POST"><input type="text" name="title"><button type="submit">Post</button></form>');
-    // res.sendFile(path.join(__dirname, '../', 'views', 'add-product.html'));
     res.render('admin/add-product', {pageTitle:'Add Product', activePath: "/admin/add-product"});
 };
 
 postAddProduct = (req, res, next) => {
-    console.log(req.body);
-    
     //save to model
-    let product = new Product(req.body.title);
+    const title = req.body.title;
+    const imageUrl = req.body.imageUrl;
+    const price = +req.body.price;
+    const description = req.body.description;
+
+    let product = new Product(title, imageUrl, description, price);
     product.save();
 
-    res.redirect("/");
+    res.redirect("products");
 };
 
 getEditProduct = (req, res, next) => {

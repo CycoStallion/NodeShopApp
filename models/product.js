@@ -17,14 +17,24 @@ const getAllProductsFromFile = (callback) => {
 }
 
 class Product{
-    constructor(productTitle){
-        this.title = productTitle
+    constructor(productTitle, imageUrl, description, price){
+        this.title = productTitle;
+        this.imageUrl = imageUrl;
+        this.description = description;
+        this.price = price;
     }
 
     save(){
         getAllProductsFromFile((products) => {
             //Add new product 
-            products.push(this.title);
+            let newProduct = {
+                title: this.title,
+                imageUrl: this.imageUrl,
+                description: this.description,
+                price: this.price
+            };
+
+            products.push(newProduct);
 
             //Write back to file with new data
             fs.writeFile(filePath, JSON.stringify(products), (err) => {
