@@ -36,9 +36,17 @@ getCheckout = (req, res, next) => {
     }); //Render the checkout view. Its path and format is already mentioned in the app.js configuration
 };
 
+getOrders = (req, res, next) => {
+    res.render('shop/orders', {
+        pageTitle:'Your Orders', 
+        activePath: "/orders"
+    }); //Render the orders view. Its path and format is already mentioned in the app.js configuration
+};
+
 module.exports = {
     getProducts,
     getIndex,
     getCart,
-    getCheckout
+    getCheckout,
+    getOrders
 }
