@@ -1,9 +1,8 @@
-const path = require('path');
 const express = require('express');
 
 const router = express.Router();
 
-const {getAddProducts, postAddProducts} = require('../controllers/productController');
+const {getAddProduct, postAddProduct, getProducts} = require('../controllers/adminController');
 
 //GET  /admin/product-page
 router.get('/product-page', (req, res, next) => {
@@ -12,11 +11,13 @@ router.get('/product-page', (req, res, next) => {
 });
 
 //GET /admin/add-product
-router.get('/add-product', getAddProducts);
+router.get('/add-product', getAddProduct);
 
 //Only handle post request here
 //POST /admin/add-product
-router.post("/add-product", postAddProducts);
+router.post("/add-product", postAddProduct);
 
+//GET /admin/getProducts
+router.get("/products", getProducts);
 
 module.exports = router
