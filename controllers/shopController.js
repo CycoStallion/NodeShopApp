@@ -14,7 +14,7 @@ getProducts = (req, res, next) => {
 
 getProductDetails = (req, res, next) => {
     const productId = req.params.productId;
-    Product.findById("AZC3", (product) => {
+    Product.findById(productId, (product) => {
         res.render('shop/product-details', {
             product,
             pageTitle: product ? product.title : 'Oh-oh', 
@@ -40,6 +40,17 @@ getCart = (req, res, next) => {
     }); //Render the cart view. Its path and format is already mentioned in the app.js configuration
 };
 
+postProductToCart = (req, res, next) => {
+    const productId = req.body.productId;
+    Product.findById(productId, (product) => {
+        res.render('shop/cart', {
+            product,
+            pageTitle: product ? product.title : 'Oh-oh', 
+            activePath: "/cart"
+        }); //Render the cart view. Its path and format is already mentioned in the app.js configuration
+    });
+}
+
 getCheckout = (req, res, next) => {
     res.render('shop/checkout', {
         pageTitle:'Checkout', 
@@ -59,6 +70,7 @@ module.exports = {
     getProductDetails,
     getIndex,
     getCart,
+    postProductToCart,
     getCheckout,
     getOrders
 }
