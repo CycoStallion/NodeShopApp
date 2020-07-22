@@ -20,7 +20,8 @@ const getAllProductsFromFile = (callback) => {
 }
 
 class Product{
-    constructor(productTitle, imageUrl, description, price){
+    constructor(productTitle, imageUrl, description, price, id = null){
+        this.id = id;
         this.title = productTitle;
         this.imageUrl = imageUrl;
         this.description = description;
@@ -28,16 +29,34 @@ class Product{
     }
 
     save(){
-        getAllProductsFromFile((products) => {
-            //Add new product 
-            this.id = id;
-            products.push(this);
+        if(this.id){
+            getAllProductsFromFile(products => {
+                const existingProductIndex = products.findIndex(prod => prod.id.toString() === this.id.toString());
+                products[existingProductIndex] = this;
 
-            //Write back to file with new data
-            fs.writeFile(filePath, JSON.stringify(products), (err) => {
-                console.log(err);
+                // existingProduct.title = this.title;
+                // existingProduct.imageUrl = this.imageUrl;
+                // existingProduct.description = this.description;
+                // existingProduct.price = this.price;
+
+                //Write back to file with new data
+                fs.writeFile(filePath, JSON.stringify(products), (err) => {
+                    console.log(err);
+                });
             });
-        });
+        }
+        else{
+            getAllProductsFromFile((products) => {
+                //Add new product 
+                this.id = id;
+                products.push(this);
+    
+                //Write back to file with new data
+                fs.writeFile(filePath, JSON.stringify(products), (err) => {
+                    console.log(err);
+                });
+            });
+        }
     }
 
     static fetchAll(callback){
@@ -46,6 +65,7 @@ class Product{
 
     static findById(productId, callback){
         getAllProductsFromFile((products) => {
+            console.log("Find by id", productId.toString())
             callback(products.find(p => p.id.toString() === productId.toString()));
         })
     }

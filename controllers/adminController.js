@@ -13,7 +13,7 @@ getProducts = (req, res, next) => {
 };
 
 getAddProduct = (req, res, next) => {
-    res.render('admin/add-product', {pageTitle:'Add Product', activePath: "/admin/add-product"});
+    res.render('admin/add-product', {pageTitle:'Add Product',activePath: "/admin/add-product"});
 };
 
 postAddProduct = (req, res, next) => {
@@ -30,12 +30,44 @@ postAddProduct = (req, res, next) => {
 };
 
 getEditProduct = (req, res, next) => {
-    res.render('admin/edit-product', {pageTitle: 'Edit Product', activePath: "/admin/edit-product"})
+    const productId = req.params.productId;
+
+    Product.findById(productId, (product) => {
+        if(!product) {
+            return res.redirect('/notFound');
+        }
+        res.render('admin/add-product', {
+            pageTitle: 'Edit Product', 
+            activePath: "/admin/edit-product",
+            product
+        })
+    })
+};
+
+postEditProduct = (req, res, next) => {
+    //save to model
+    const productId = req.body.productId;
+    const title = req.body.title;
+    const imageUrl = req.body.imageUrl;
+    const price = +req.body.price;
+    const description = req.body.description;
+
+    Product.findById(productId, (product) => {
+        if(!product) {
+            return res.redirect('/notFound');
+        }
+
+        let updatedProduct = new Product(title, imageUrl, description, price, productId);
+        updatedProduct.save();
+
+        res.redirect("products");
+    })
 };
 
 module.exports = {
     getProducts,
     getAddProduct,
     postAddProduct,
-    getEditProduct
+    getEditProduct,
+    postEditProduct
 }
