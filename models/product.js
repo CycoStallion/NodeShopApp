@@ -2,6 +2,8 @@ const fs = require('fs');
 const path = require('path');
 const crypto = require("crypto");
 
+const Cart = require('./cart');
+
 const filePath = path.join(__dirname, '../', 'data', 'products.json');
 
 const randomGeneratedId = crypto.randomBytes(16).toString("hex");
@@ -76,6 +78,8 @@ class Product{
             fs.writeFile(filePath, JSON.stringify(updatedProducts), (err) => {
                 if(err) console.log(err);
             });
+
+            Cart.deleteProduct(productId);
         });
     }
 }

@@ -68,7 +68,6 @@ postDeleteProduct = (req, res, next) => {
     const productId = req.body.productId;
 
     Product.deleteById(productId);
-    console.log("after delete");
 
     res.redirect('/');
 }

@@ -42,6 +42,26 @@ class Cart{
         });
         //Add new product / increase quantity
     }
+
+    static deleteProduct(productId, productPrice){
+        fs.readFile(filePath, (err, fileContent) => {
+            //Cart object structure to store
+            let cart = {products:[], totalPrice:0};
+            
+            //Check if we have data and construct cart object from it
+            if(!err){
+                cart = JSON.parse(fileContent);
+                const product = cart.products.find(prod => prod.productId === productId);
+                cart.totalPrice -= product.price;
+
+                cart.products = cart.products.filter(prod => prod.productId !== productId);
+
+                fs.writeFile(filePath, JSON.stringify(cart), (err) => {
+                    if(err) console.log("Error while writing cart:", err);
+                })
+            }
+        });
+    }
 }
 
 module.exports = Cart;
