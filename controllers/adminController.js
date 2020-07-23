@@ -64,10 +64,20 @@ postEditProduct = (req, res, next) => {
     })
 };
 
+postDeleteProduct = (req, res, next) => {
+    const productId = req.body.productId;
+
+    Product.deleteById(productId);
+    console.log("after delete");
+
+    res.redirect('/');
+}
+
 module.exports = {
     getProducts,
     getAddProduct,
     postAddProduct,
     getEditProduct,
-    postEditProduct
+    postEditProduct,
+    postDeleteProduct
 }

@@ -4,7 +4,7 @@ const crypto = require("crypto");
 
 const filePath = path.join(__dirname, '../', 'data', 'products.json');
 
-const id = crypto.randomBytes(16).toString("hex");
+const randomGeneratedId = crypto.randomBytes(16).toString("hex");
 
 const getAllProductsFromFile = (callback) => {
     fs.readFile(filePath, (err, fileData) => {
@@ -29,31 +29,30 @@ class Product{
     }
 
     save(){
-        if(this.id){
+        if(this.id){ //Modify the product 
             getAllProductsFromFile(products => {
                 const existingProductIndex = products.findIndex(prod => prod.id.toString() === this.id.toString());
-                products[existingProductIndex] = this;
 
-                // existingProduct.title = this.title;
-                // existingProduct.imageUrl = this.imageUrl;
-                // existingProduct.description = this.description;
-                // existingProduct.price = this.price;
+                if(existingProductIndex > -1){ //If the product is found 
+                    products[existingProductIndex] = this;
+                    
+                    //Write back to file with new data
+                    fs.writeFile(filePath, JSON.stringify(products), (err) => {
+                        console.log(err);
+                    });
+                }
 
-                //Write back to file with new data
-                fs.writeFile(filePath, JSON.stringify(products), (err) => {
-                    console.log(err);
-                });
+                //TODO : When product is not found
             });
         }
-        else{
+        else{ //Add a new product
             getAllProductsFromFile((products) => {
-                //Add new product 
-                this.id = id;
+                this.id = randomGeneratedId;
                 products.push(this);
     
                 //Write back to file with new data
                 fs.writeFile(filePath, JSON.stringify(products), (err) => {
-                    console.log(err);
+                    if(err) console.log(err);
                 });
             });
         }
@@ -65,9 +64,19 @@ class Product{
 
     static findById(productId, callback){
         getAllProductsFromFile((products) => {
-            console.log("Find by id", productId.toString())
             callback(products.find(p => p.id.toString() === productId.toString()));
         })
+    }
+
+    static deleteById(productId){
+        getAllProductsFromFile(products => {
+            const updatedProducts = products.filter(prod => prod.id.toString() !== productId.toString());
+
+            //Write back to file with new data
+            fs.writeFile(filePath, JSON.stringify(updatedProducts), (err) => {
+                if(err) console.log(err);
+            });
+        });
     }
 }
 
