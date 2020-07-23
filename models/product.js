@@ -77,9 +77,9 @@ class Product{
             //Write back to file with new data
             fs.writeFile(filePath, JSON.stringify(updatedProducts), (err) => {
                 if(err) console.log(err);
+                Cart.deleteProduct(productId);
             });
 
-            Cart.deleteProduct(productId);
         });
     }
 }
