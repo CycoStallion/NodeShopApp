@@ -52,15 +52,30 @@ class Cart{
             if(!err){
                 cart = JSON.parse(fileContent);
                 const product = cart.products.find(prod => prod.productId === productId);
-                cart.totalPrice -= product.price;
-
-                cart.products = cart.products.filter(prod => prod.productId !== productId);
-
-                fs.writeFile(filePath, JSON.stringify(cart), (err) => {
-                    if(err) console.log("Error while writing cart:", err);
-                })
+                if(product){
+                    cart.totalPrice -= product.price;
+    
+                    cart.products = cart.products.filter(prod => prod.productId !== productId);
+    
+                    fs.writeFile(filePath, JSON.stringify(cart), (err) => {
+                        if(err) console.log("Error while writing cart:", err);
+                    });
+                }
             }
         });
+    }
+
+    static getCart(callback){
+        fs.readFile(filePath, (err, fileContent) =>{
+            if(err){
+                return callback([]);
+            }
+            try {
+                callback(JSON.parse(fileContent))
+            } catch (error) {
+                callback([]);
+            }
+        })
     }
 }
 
