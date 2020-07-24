@@ -5,5 +5,20 @@
 </head>
 
 <%- include('../includes/content.ejs') %>
-
+    <main>
+        <% if(products.length){ %>
+            <ul>
+                <% products.map(prod => { %>
+                    <li>
+                        <%= prod.productData.title %>(<%= prod.quantity %>) - <%= prod.productPrice %>
+                        <a href="/cart-item-delete/<%= prod.productData.id %>" class="btn">&times;</a>
+                    </li>
+                    
+                <% }) %>
+            </ul>
+            <p>Total Cost : <%= totalPrice.toFixed(2) %></p>
+        <% } else { %>
+            <h1>No Products in Cart!</h1>
+        <% } %>
+    </main>
 <%- include('../includes/end.ejs') %>

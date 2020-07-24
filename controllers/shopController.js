@@ -1,4 +1,5 @@
 const Product = require('../models/product');
+const Cart = require('../models/cart');
 
 getProducts = (req, res, next) => {
     
@@ -12,6 +13,17 @@ getProducts = (req, res, next) => {
     
 };
 
+getProductDetails = (req, res, next) => {
+    const productId = req.params.productId;
+    Product.findById(productId, (product) => {
+        res.render('shop/product-details', {
+            product,
+            pageTitle: product ? product.title : 'Oh-oh', 
+            activePath: "/products"
+        }); //Render the products view. Its path and format is already mentioned in the app.js configuration
+    });    
+};
+
 getIndex = (req, res, next) => {
     Product.fetchAll((products) => {
         res.render('shop/index', {
@@ -23,11 +35,39 @@ getIndex = (req, res, next) => {
 };
 
 getCart = (req, res, next) => {
-    res.render('shop/cart', {
-        pageTitle:'Your Cart', 
-        activePath: "/cart"
-    }); //Render the cart view. Its path and format is already mentioned in the app.js configuration
+    Cart.getCart((cart) => {
+        
+        Product.fetchAll(products => {
+            const cartProducts = [];
+            products.forEach(prod => {
+                const cartProduct = cart.products.find(cp => cp.productId === prod.id);
+                cartProduct && cartProducts.push({productData: prod, productPrice: cartProduct.price, quantity: cartProduct.quantity});
+            });
+
+            res.render('shop/cart', {
+                pageTitle:'Your Cart', 
+                activePath: "/cart",
+                products: cartProducts,
+                totalPrice: cart.totalPrice
+            }); //Render the cart view. Its path and format is already mentioned in the app.js configuration
+        });    
+    })
 };
+
+postProductToCart = (req, res, next) => {
+    const productId = req.body.productId;
+    Product.findById(productId, (product) => {
+        //Add product to cart
+        Cart.addProduct(productId, product.price);
+        res.redirect('/cart');
+    });
+}
+
+deleteProductFromCart = (req, res, next) => {
+    let productId = req.params.productId;
+    Cart.deleteProduct(productId);
+    res.redirect('/cart');
+}
 
 getCheckout = (req, res, next) => {
     res.render('shop/checkout', {
@@ -45,8 +85,11 @@ getOrders = (req, res, next) => {
 
 module.exports = {
     getProducts,
+    getProductDetails,
     getIndex,
     getCart,
+    postProductToCart,
+    deleteProductFromCart,
     getCheckout,
     getOrders
 }
