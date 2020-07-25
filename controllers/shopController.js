@@ -41,14 +41,20 @@ getCart = (req, res, next) => {
             const cartProducts = [];
             products.forEach(prod => {
                 const cartProduct = cart.products.find(cp => cp.productId === prod.id);
-                cartProduct && cartProducts.push({productData: prod, productPrice: cartProduct.price, quantity: cartProduct.quantity});
+                cartProduct && cartProducts.push({productData: prod, productPrice: cartProduct.quantity * prod.price, quantity: cartProduct.quantity});
             });
+
+            let reducer = (acc, cur) => {
+                return acc + cur;
+            }
+
+            let totalPrice = cartProducts.map(c => c.productPrice).reduce(reducer);
 
             res.render('shop/cart', {
                 pageTitle:'Your Cart', 
                 activePath: "/cart",
                 products: cartProducts,
-                totalPrice: cart.totalPrice
+                totalPrice: totalPrice
             }); //Render the cart view. Its path and format is already mentioned in the app.js configuration
         });    
     })
