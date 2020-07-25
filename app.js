@@ -13,7 +13,7 @@ const pageNotFound = require('./controllers/404Controller');
 //Database configuration
 db.execute('SELECT * FROM products')
     .then(response => {
-        console.log(response);
+        console.log(response[0], response[1]);
     })
     .catch(err => {
         console.log(err);
