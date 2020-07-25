@@ -1,6 +1,7 @@
 const path = require('path');
 const express = require('express');
 const bodyParser = require('body-parser');
+const db = require('./utils/database');
 
 const app = express();
 
@@ -8,6 +9,15 @@ const adminRoutes = require('./routes/admin');
 const shopRoutes = require('./routes/shop');
 
 const pageNotFound = require('./controllers/404Controller');
+
+//Database configuration
+db.execute('SELECT * FROM products')
+    .then(response => {
+        console.log(response);
+    })
+    .catch(err => {
+        console.log(err);
+    });
 
 //BodyParser
 app.use(bodyParser.urlencoded({extended: true}));
