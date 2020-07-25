@@ -1,5 +1,5 @@
-const Product = require('../models/product');
-const Cart = require('../models/cart');
+const Product = require('../models/fileData/product');
+const Cart = require('../models/fileData/cart');
 
 getProducts = (req, res, next) => {
     
