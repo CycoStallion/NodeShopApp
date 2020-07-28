@@ -1,14 +1,16 @@
 const Product = require('../models/product');
 
 getProducts = (req, res, next) => {
-    
-    Product.fetchAll((products) => {
-        res.render('admin/products', {
-            products, 
-            pageTitle:'Admin Products', 
-            activePath: "/admin/products"
-        }); //Render the products view. Its path and format is already mentioned in the app.js configuration
-    });
+
+    Product.fetchAll()
+        .then(([dataRow, fieldMetaData]) => {
+            res.render('admin/products', {
+                products: dataRow, 
+                pageTitle:'Admin Products', 
+                activePath: "/admin/products"
+            }); //Render the products view. Its path and format is already mentioned in the app.js configuration
+        })
+        .catch(err => console.log(err));
     
 };
 
@@ -23,10 +25,13 @@ postAddProduct = (req, res, next) => {
     const price = +req.body.price;
     const description = req.body.description;
 
-    let product = new Product(title, imageUrl, description, price);
-    product.save();
+    const product = new Product(title, imageUrl, description, price);
+    product.save()
+        .then(() => {
+            res.redirect("products");
+        })
+        .catch(err => console.log(err));
 
-    res.redirect("products");
 };
 
 getEditProduct = (req, res, next) => {
