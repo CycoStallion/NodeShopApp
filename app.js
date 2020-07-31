@@ -30,7 +30,7 @@ app.set('views', path.join(__dirname, 'views', 'ejs'));
 app.use((req, res, next) => {
     User.findByPk(1)
         .then(user => {
-            req.user = user;
+            req.user = user; //This is the sequelize user which contains all sequelize methods for an instance
             next();
         })
         .catch(err => {
@@ -56,6 +56,7 @@ app.use(pageNotFound);
 //1. A product is created by some user in the application and is the owner of it.
 //When the user is gone, the product should not exist either
 Product.belongsTo(User, {constraints: true, onDelete: 'CASCADE'});
+User.hasMany(Product); //This is required to enable mixins
 
 sequelize
     .sync()    
