@@ -1,7 +1,7 @@
 const path = require('path');
 const express = require('express');
 const bodyParser = require('body-parser');
-const db = require('./utils/database');
+const sequelize = require('./utils/database');
 
 const app = express();
 
@@ -37,8 +37,13 @@ app.use((req, res, next) => {
 
 app.use(pageNotFound);
 
-
+sequelize.sync()    
+        .then(result => {
+            // console.log(result); 
+            app.listen(3000)
+        })
+        .catch((err) => console.log("Error:",err))
 
 
 //Using express -> app.listen, which means we wont require 'http' any more
-app.listen(3000);
+// app.listen(3000);
