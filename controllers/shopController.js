@@ -3,13 +3,13 @@ const Cart = require('../models/fileData/cart');
 
 getProducts = (req, res, next) => {
     
-    Product.fetchAll()
-        .then(([dataRow, fieldMetaData]) => {
+    Product.findAll()
+        .then(products => {
             res.render('shop/product-list', {
-                products: dataRow, 
-                pageTitle:'All Products', 
+                products: products, 
+                pageTitle:'Shop', 
                 activePath: "/products"
-            }); //Render the products view. Its path and format is already mentioned in the app.js configuration
+            }); //Render the index view. Its path and format is already mentioned in the app.js configuration
         })
         .catch(err => console.log(err));
   
@@ -17,12 +17,12 @@ getProducts = (req, res, next) => {
 
 getProductDetails = (req, res, next) => {
     const productId = req.params.productId;
-
-    Product.findById(productId)
-        .then(([dataRow, fieldMetaData]) => {
+    
+    Product.findByPk(productId)
+        .then((product) => {
             res.render('shop/product-details', {
-                product: dataRow[0], 
-                pageTitle: dataRow[0] ? dataRow[0].title : 'Oh-oh', 
+                product: product, 
+                pageTitle: product ? product.title : 'Oh-oh', 
                 activePath: "/products"
             }); //Render the products view. Its path and format is already mentioned in the app.js configuration
         })
@@ -32,15 +32,15 @@ getProductDetails = (req, res, next) => {
 
 getIndex = (req, res, next) => {
     
-    Product.fetchAll()
-    .then(([dataRow, fieldMetaData]) => {
-        res.render('shop/index', {
-            products: dataRow, 
-            pageTitle:'Shop', 
-            activePath: "/"
-        }); //Render the index view. Its path and format is already mentioned in the app.js configuration
-    })
-    .catch(err => console.log(err));
+    Product.findAll()
+            .then(products => {
+                res.render('shop/index', {
+                    products: products, 
+                    pageTitle:'Shop', 
+                    activePath: "/"
+                }); //Render the index view. Its path and format is already mentioned in the app.js configuration
+            })
+            .catch(err => console.log(err));
 };
 
 getCart = (req, res, next) => {
