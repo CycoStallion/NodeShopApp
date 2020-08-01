@@ -44,27 +44,37 @@ getIndex = (req, res, next) => {
 };
 
 getCart = (req, res, next) => {
-    
-    req.user
-        .getCart()
+    const user = req.user;
+
+    user.getCart()
         .then(cart => {
+            if(!cart){
+                return [];
+            }
+
             return cart.getProducts();
         })
         .then(products => {
             const cartProducts = [];
-            products.forEach(product => {
-                cartProducts.push({
-                    productData: product, 
-                    productPrice: product.cartItem.quantity * product.price, 
-                    quantity: product.cartItem.quantity
-                });
-            });
+            let totalPrice = 0;
+            console.log("Cart products to see",products);
 
-            let reducer = (acc, cur) => {
-                return acc + cur;
+            if(products.length){
+                products.forEach(product => {
+                    cartProducts.push({
+                        productData: product, 
+                        productPrice: product.cartItem.quantity * product.price, 
+                        quantity: product.cartItem.quantity
+                    });
+                });
+    
+                let reducer = (acc, cur) => {
+                    return acc + cur;
+                }
+    
+                totalPrice = cartProducts.map(c => c.productPrice).reduce(reducer);
             }
 
-            let totalPrice = cartProducts.map(c => c.productPrice).reduce(reducer);
             res.render('shop/cart', {
                 pageTitle:'Your Cart', 
                 activePath: "/cart",
@@ -85,6 +95,12 @@ postProductToCart = (req, res, next) => {
                 let fetchedCart;
                 user.getCart()
                     .then(cart => {
+                        if(!cart){
+                            return user.createCart()
+                        }
+                        return cart;
+                    })
+                    .then(cart => {
                         fetchedCart = cart;
                         return cart.getProducts({where:{id: productId}})
                     })
@@ -104,13 +120,6 @@ postProductToCart = (req, res, next) => {
                     .catch(err => console.log(err))
             })
             .catch(err => console.log(err));
-
-
-    // Product.findById(productId, (product) => {
-    //     //Add product to cart
-    //     Cart.addProduct(productId, product.price);
-    //     res.redirect('/cart');
-    // });
 }
 
 deleteProductFromCart = (req, res, next) => {
@@ -141,11 +150,46 @@ getCheckout = (req, res, next) => {
 };
 
 getOrders = (req, res, next) => {
-    res.render('shop/orders', {
-        pageTitle:'Your Orders', 
-        activePath: "/orders"
-    }); //Render the orders view. Its path and format is already mentioned in the app.js configuration
+    const user = req.user;
+    
+    user.getOrders({include: Product}) //Eager load all products for an order
+        .then(orders => {
+            res.render('shop/orders', {
+                pageTitle:'Your Orders', 
+                activePath: "/orders",
+                orders
+            }); //Render the orders view. Its path and format is already mentioned in the app.js configuration
+        })
+        .catch(err => console.log(err));                  
 };
+                
+postOrder = (req, res, next) => {
+    const user = req.user;
+    let cartProducts;
+
+    user.getCart()
+        .then(cart => {
+            cart.getProducts()
+                .then(products => {
+                    cartProducts = products;
+                    console.log("Ordering these products:", cartProducts);
+                    return user.createOrder();
+                })
+                .then(order => {
+                    cartProducts.forEach(product => {
+                        order.addProduct(product, {
+                            through: {quantity: product.cartItem.quantity}
+                        })
+                    })
+
+                    return cart.setProducts(null); //Remove all products from a cart
+                })
+                .then(result => {
+                    res.redirect("/orders");
+                })
+        })
+        .catch(err => console.log(err));
+}
 
 module.exports = {
     getProducts,
@@ -155,5 +199,6 @@ module.exports = {
     postProductToCart,
     deleteProductFromCart,
     getCheckout,
-    getOrders
+    getOrders,
+    postOrder
 }
