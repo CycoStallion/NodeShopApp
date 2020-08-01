@@ -2,16 +2,18 @@
     <link rel="stylesheet" href="/css/main.css">
     <link rel="stylesheet" href="/css/forms.css">
     <link rel="stylesheet" href="/css/product.css">
+    <link rel="stylesheet" href="/css/cart.css">
 </head>
 
 <%- include('../includes/content.ejs') %>
     <main>
         <% if(products.length){ %>
-            <ul>
+            <ul class="cart__item-list">
                 <% products.map(prod => { %>
-                    <li>
-                        <%= prod.productData.title %>(<%= prod.quantity %>) - <%= prod.productPrice %>
-                        <a href="/cart-item-delete/<%= prod.productData.id %>" class="btn">&times;</a>
+                    <li class="cart__item">
+                        <h1><%= prod.productData.title %>[<%= prod.quantity %>]</h1>
+                        <h2>Price: <%= prod.productPrice %></h2>
+                        <a href="/cart-item-delete/<%= prod.productData.id %>" class="btn danger">&times;</a>
                     </li>
                     
                 <% }) %>
