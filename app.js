@@ -7,6 +7,8 @@ const Product = require('./models/product');
 const User = require('./models/user');
 const Cart = require('./models/cart');
 const CartItem = require('./models/cartItem');
+const Order = require('./models/order');
+const OrderItem = require('./models/orderItem');
 
 const app = express();
 
@@ -68,6 +70,13 @@ Cart.belongsTo(User);
 Cart.belongsToMany(Product, {through: CartItem})
 Product.belongsToMany(Cart, {through: CartItem})
 
+//4. An order is created by some user in the application and is the owner of it
+Order.belongsTo(User);
+User.hasMany(Order);
+
+//5. There can be many products in an order
+Order.belongsToMany(Product, {through: OrderItem});
+Product.belongsToMany(Order, {through: OrderItem});
 
 sequelize
     .sync()    

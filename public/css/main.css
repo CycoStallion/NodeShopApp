@@ -205,6 +205,17 @@ form {
   color: white;
 }
 
+.btn.success {
+  color: lightgreen;
+  border-color: cyan;
+}
+
+.btn.success:hover,
+.btn.success:active {
+  background: lightgreen;
+  color: white;
+}
+
 .btn.danger {
   color: red;
   border-color: red;
