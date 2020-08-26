@@ -19,11 +19,11 @@ router.get("/product-page", (req, res, next) => {
 
 // router.post('/delete-product', postDeleteProduct);
 
-// //GET /admin/edit-product
-// router.get('/edit-product/:productId', getEditProduct);
+//GET /admin/edit-product
+router.get("/edit-product/:productId", getEditProduct);
 
-// //POST /admin/edit-product
-// router.post('/edit-product', postEditProduct);
+//POST /admin/edit-product
+router.post("/edit-product", postEditProduct);
 
 //GET /admin/add-product
 router.get("/add-product", getAddProduct);
@@ -32,7 +32,7 @@ router.get("/add-product", getAddProduct);
 //POST /admin/add-product
 router.post("/add-product", postAddProduct);
 
-// //GET /admin/getProducts
-// router.get("/products", getProducts);
+//GET /admin/getProducts
+router.get("/products", getProducts);
 
 module.exports = router;

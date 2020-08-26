@@ -1,8 +1,7 @@
 const Product = require("../models/product");
 
 getProducts = (req, res, next) => {
-  req.user
-    .getProducts()
+  Product.fetchAll()
     .then((products) => {
       res.render("admin/products", {
         products: products,
@@ -11,16 +10,6 @@ getProducts = (req, res, next) => {
       }); //Render the products view. Its path and format is already mentioned in the app.js configuration
     })
     .catch((err) => console.log(err));
-
-  // Product.findAll()
-  //     .then(products => {
-  //         res.render('admin/products', {
-  //             products: products,
-  //             pageTitle:'Admin Products',
-  //             activePath: "/admin/products"
-  //         }); //Render the products view. Its path and format is already mentioned in the app.js configuration
-  //     })
-  //     .catch(err => console.log(err));
 };
 
 getAddProduct = (req, res, next) => {
@@ -54,34 +43,20 @@ postAddProduct = (req, res, next) => {
 getEditProduct = (req, res, next) => {
   const productId = req.params.productId;
 
-  req.user
-    .getProducts({ where: { id: productId } })
-    .then((products) => {
-      if (!products) {
+  Product.findById(productId)
+    .then((product) => {
+      if (!product) {
         return res.redirect("/notFound");
       }
       res.render("admin/add-product", {
         pageTitle: "Edit Product",
         activePath: "/admin/edit-product",
-        product: products[0],
-      }); //Render the products view. Its path and format is already mentioned in the app.js configuration
+        product,
+      });
     })
-    .catch((err) => console.log(err));
-
-  // Product.findByPk(productId)
-  //     .then((product) => {
-  //         if(!product) {
-  //             return res.redirect('/notFound');
-  //         }
-  //         res.render('admin/add-product', {
-  //             pageTitle: 'Edit Product',
-  //             activePath: "/admin/edit-product",
-  //             product
-  //         })
-  //     })
-  //     .catch(err => {
-  //         console.log(err);
-  //     })
+    .catch((err) => {
+      console.log(err);
+    });
 };
 
 postEditProduct = (req, res, next) => {
@@ -92,19 +67,10 @@ postEditProduct = (req, res, next) => {
   const price = +req.body.price;
   const description = req.body.description;
 
-  Product.findByPk(productId)
-    .then((product) => {
-      if (!product) {
-        return res.redirect("/notFound");
-      }
+  let product = new Product(title, price, imageUrl, description, roductId);
 
-      product.title = title;
-      product.imageUrl = imageUrl;
-      product.price = price;
-      product.description = description;
-      console.log(product);
-      return product.save();
-    })
+  product
+    .save()
     .then((updatedProduct) => {
       res.redirect("products");
     })

@@ -6,7 +6,7 @@ const { mongoConnect } = require("./utils/database");
 const app = express();
 
 const adminRoutes = require("./routes/admin");
-// const shopRoutes = require('./routes/shop');
+const shopRoutes = require("./routes/shop");
 
 const pageNotFound = require("./controllers/404Controller");
 
@@ -38,7 +38,7 @@ app.use((req, res, next) => {
 
 //Load Routes
 app.use("/admin", adminRoutes);
-// app.use(shopRoutes);
+app.use(shopRoutes);
 
 //Custom Middleware
 app.use((req, res, next) => {
