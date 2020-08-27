@@ -4,12 +4,13 @@ const { getDb } = require("../utils/database");
 let mongoCollectionName = "products";
 
 class Product {
-  constructor(title, price, imageUrl, description, id = null) {
+  constructor(title, price, imageUrl, description, userId, id = null) {
     this.title = title;
     this.price = price;
     this.imageUrl = imageUrl;
     this.description = description;
-    this._id = id && new mongoDb.ObjectID(id);
+    this.userId = userId && new mongoDb.ObjectId(userId);
+    this._id = id && new mongoDb.ObjectId(id);
   }
 
   save() {
@@ -20,7 +21,7 @@ class Product {
       //Update the product when id is passed in
       dbOp = db
         .collection(mongoCollectionName)
-        .updateOne({ _id: new mongoDb.ObjectID(this._id) }, { $set: this });
+        .updateOne({ _id: this._id }, { $set: this });
     } else {
       dbOp = db.collection(mongoCollectionName).insertOne(this);
     }
@@ -46,7 +47,7 @@ class Product {
     const db = getDb();
     return db
       .collection(mongoCollectionName)
-      .find({ _id: new mongoDb.ObjectID(productId) })
+      .find({ _id: new mongoDb.ObjectId(productId) })
       .next()
       .then((productDetails) => {
         console.log(productDetails);
@@ -59,7 +60,7 @@ class Product {
     const db = getDb();
     return db
       .collection(mongoCollectionName)
-      .deleteOne({ _id: new mongoDb.ObjectID(productId) })
+      .deleteOne({ _id: new mongoDb.ObjectId(productId) })
       .then((result) => console.log("Delete result: ", result))
       .catch((err) => console.log(err));
   }

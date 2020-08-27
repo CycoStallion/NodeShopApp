@@ -2,6 +2,7 @@ const path = require("path");
 const express = require("express");
 const bodyParser = require("body-parser");
 const { mongoConnect } = require("./utils/database");
+const User = require("./models/user");
 
 const app = express();
 
@@ -25,15 +26,15 @@ app.set("views", path.join(__dirname, "views", "ejs"));
 
 //Load user - Store the dummy user in the req
 app.use((req, res, next) => {
-  // User.findByPk(1)
-  //     .then(user => {
-  //         req.user = user; //This is the sequelize user which contains all sequelize methods for an instance
-  //         next();
-  //     })
-  //     .catch(err => {
-  //         console.log(err)
-  //     })
-  next();
+  User.findById("5f47464ac00323c479deca07")
+    .then((user) => {
+      console.log("When saving to request: ", user);
+      req.user = user;
+      next();
+    })
+    .catch((err) => {
+      console.log(err);
+    });
 });
 
 //Load Routes
