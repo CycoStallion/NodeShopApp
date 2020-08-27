@@ -80,11 +80,7 @@ postEditProduct = (req, res, next) => {
 postDeleteProduct = (req, res, next) => {
   const productId = req.body.productId;
 
-  Product.destroy({
-    where: {
-      id: productId,
-    },
-  })
+  Product.deleteById(productId)
     .then((data) => {
       console.log("Deleted data:", data);
       res.redirect("/");

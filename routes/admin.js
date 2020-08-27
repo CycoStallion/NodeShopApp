@@ -17,7 +17,7 @@ router.get("/product-page", (req, res, next) => {
   res.redirect("/");
 });
 
-// router.post('/delete-product', postDeleteProduct);
+router.post("/delete-product", postDeleteProduct);
 
 //GET /admin/edit-product
 router.get("/edit-product/:productId", getEditProduct);
