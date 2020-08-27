@@ -67,7 +67,7 @@ postEditProduct = (req, res, next) => {
   const price = +req.body.price;
   const description = req.body.description;
 
-  let product = new Product(title, price, imageUrl, description, roductId);
+  let product = new Product(title, price, imageUrl, description, productId);
 
   product
     .save()
