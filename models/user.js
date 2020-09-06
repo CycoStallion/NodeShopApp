@@ -23,8 +23,8 @@ class User {
     }
 
     return dbOp
-      .then((insertedUser) => {
-        console.log("Added user: ", insertedUser);
+      .then((returnedUser) => {
+        console.log("Returned user: ", returnedUser);
       })
       .catch((err) => console.log(err));
   }

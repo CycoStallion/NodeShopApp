@@ -28,7 +28,7 @@ app.set("views", path.join(__dirname, "views", "ejs"));
 app.use((req, res, next) => {
   User.findById("5f47464ac00323c479deca07")
     .then((user) => {
-      console.log("When saving to request: ", user);
+      console.log("When saving to request(req): ", user);
       req.user = user;
       next();
     })
