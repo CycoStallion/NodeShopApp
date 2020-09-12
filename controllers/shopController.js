@@ -1,5 +1,5 @@
 const Product = require("../models/product");
-const Cart = require("../models/cart");
+const Order = require("../models/order");
 
 getProducts = (req, res, next) => {
   Product.fetchAll()
@@ -39,6 +39,47 @@ getIndex = (req, res, next) => {
     .catch((err) => console.log(err));
 };
 
+getCartInternals = (cartItems) => {
+  const cartProducts = [];
+  let totalPrice = 0;
+
+  const cartProductIds = cartItems.map((cp) => {
+    return cp.productId;
+  });
+
+  return Product.findByIds(cartProductIds).then((products) => {
+    if (products.length) {
+      products.forEach((product) => {
+        let cartItem = cartItems.find(
+          (cp) => cp.productId.toString() === product._id.toString()
+        );
+
+        cartProducts.push({
+          productData: product,
+          productPrice: cartItem.quantity * product.price,
+          quantity: cartItem.quantity,
+        });
+      });
+
+      let reducer = (acc, cur) => {
+        return acc + cur;
+      };
+
+      totalPrice = cartProducts.map((c) => c.productPrice).reduce(reducer);
+
+      return {
+        cartProducts,
+        totalPrice,
+      };
+    }
+
+    return {
+      cartProducts,
+      totalPrice,
+    };
+  });
+};
+
 getCart = (req, res, next) => {
   const user = req.user;
 
@@ -52,6 +93,7 @@ getCart = (req, res, next) => {
     return cp.productId;
   });
 
+  /*
   Product.findByIds(cartProductIds)
     .then((products) => {
       const cartProducts = [];
@@ -83,6 +125,20 @@ getCart = (req, res, next) => {
           totalPrice: totalPrice,
         }); //Render the cart view. Its path and format is already mentioned in the app.js configuration
       }
+    })
+    .catch((err) => console.log(err));
+    */
+
+  getCartInternals(cart.items)
+    .then((cartInternals) => {
+      const { cartProducts, totalPrice } = cartInternals;
+
+      res.render("shop/cart", {
+        pageTitle: "Your Cart",
+        activePath: "/cart",
+        products: cartProducts,
+        totalPrice: totalPrice,
+      }); //Render the cart view. Its path and format is already mentioned in the app.js configuration
     })
     .catch((err) => console.log(err));
 };
@@ -126,9 +182,25 @@ getCheckout = (req, res, next) => {
 getOrders = (req, res, next) => {
   const user = req.user;
 
-  user
-    .getOrders({ include: Product }) //Eager load all products for an order
-    .then((orders) => {
+  Order.getOrdersByUser(user._id)
+    .then((userOrders) => {
+      let orders = [];
+      orders = userOrders.map((order) => {
+        const products = order.productDetails.map((pd) => {
+          return {
+            title: pd.productData.title,
+            productPrice: pd.productPrice,
+            quantity: pd.quantity,
+          };
+        });
+
+        return {
+          id: order._id,
+          products,
+          totalCost: order.totalCost,
+        };
+      });
+
       res.render("shop/orders", {
         pageTitle: "Your Orders",
         activePath: "/orders",
@@ -140,32 +212,24 @@ getOrders = (req, res, next) => {
 
 postOrder = (req, res, next) => {
   const user = req.user;
+  const cart = user.cart;
   let cartProducts;
 
-  user
-    .getCart()
-    .then((cart) => {
-      cart
-        .getProducts()
-        .then((products) => {
-          cartProducts = products;
-          console.log("Ordering these products:", cartProducts);
-          return user.createOrder();
-        })
-        .then((order) => {
-          cartProducts.forEach((product) => {
-            order.addProduct(product, {
-              through: { quantity: product.cartItem.quantity },
-            });
-          });
+  if (cart && cart.items) {
+    let order = new Order(user._id, cart.items, 0);
 
-          return cart.setProducts(null); //Remove all products from a cart
-        })
-        .then((result) => {
+    getCartInternals(cart.items)
+      .then((cartInternals) => {
+        const { cartProducts, totalPrice } = cartInternals;
+        order.productDetails = cartProducts;
+        order.totalCost = totalPrice;
+
+        order.addProducts().then((order) => {
           res.redirect("/orders");
         });
-    })
-    .catch((err) => console.log(err));
+      })
+      .catch((err) => console.log(err));
+  }
 };
 
 module.exports = {
