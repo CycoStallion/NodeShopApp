@@ -1,35 +1,37 @@
 <%- include('../includes/head.ejs') %>
-    <link rel="stylesheet" href="/css/main.css">
-    <link rel="stylesheet" href="/css/forms.css">
-    <link rel="stylesheet" href="/css/product.css">
+<link rel="stylesheet" href="/css/main.css">
+<link rel="stylesheet" href="/css/forms.css">
+<link rel="stylesheet" href="/css/product.css">
 </head>
 
 <%- include('../includes/content.ejs') %>
 
-    <main>
-        <form class="product-form" action="/admin/<%= (locals.product)? 'edit-product' : 'add-product' %>" method="POST">
-            <% if(locals.product) { %><input type="hidden" name="productId" value="<%= product.id %>"/><% } %>
-            <div class="form-control">
-                <label for="title">Title</label>
-                <input type="text" name="title" id="title" value="<%= (locals.product)? product.title : '' %>">
-            </div>
+<main>
+    <form class="product-form" action="/admin/<%= (locals.product)? 'edit-product' : 'add-product' %>" method="POST">
+        <% if(locals.product) { %><input type="hidden" name="productId" value="<%= product._id %>" /><% } %>
+        <div class="form-control">
+            <label for="title">Title</label>
+            <input type="text" name="title" id="title" value="<%= (locals.product)? product.title : '' %>">
+        </div>
 
-            <div class="form-control">
-                <label for="imageUrl">Image URL</label>
-                <input type="text" name="imageUrl" id="imageUrl" value="<%= (locals.product)? product.imageUrl : '' %>">
-            </div>
+        <div class="form-control">
+            <label for="imageUrl">Image URL</label>
+            <input type="text" name="imageUrl" id="imageUrl" value="<%= (locals.product)? product.imageUrl : '' %>">
+        </div>
 
-            <div class="form-control">
-                <label for="description">Description</label>
-                <textarea name="description" id="description" rows="7"><%= (locals.product)? product.description: '' %></textarea>
-            </div>
+        <div class="form-control">
+            <label for="description">Description</label>
+            <textarea name="description" id="description"
+                rows="7"><%= (locals.product)? product.description: '' %></textarea>
+        </div>
 
-            <div class="form-control">
-                <label for="title">Price</label>
-                <input type="number" name="price" id="price" step="0.01" value="<%= (locals.product)? product.price : null %>">
-            </div>
+        <div class="form-control">
+            <label for="title">Price</label>
+            <input type="number" name="price" id="price" step="0.01"
+                value="<%= (locals.product)? product.price : null %>">
+        </div>
 
-            <button class="btn" type="submit"><%= (locals.product)? 'Update Product' : 'Add Product' %></button>
-        </form>
-    </main>
+        <button class="btn" type="submit"><%= (locals.product)? 'Update Product' : 'Add Product' %></button>
+    </form>
+</main>
 <%- include('../includes/end.ejs') %>

@@ -1,27 +1,28 @@
 <%- include('../includes/head.ejs') %>
-    <link rel="stylesheet" href="/css/main.css">
-    <link rel="stylesheet" href="/css/forms.css">
-    <link rel="stylesheet" href="/css/product.css">
+<link rel="stylesheet" href="/css/main.css">
+<link rel="stylesheet" href="/css/forms.css">
+<link rel="stylesheet" href="/css/product.css">
 </head>
 
 <%- include('../includes/content.ejs') %>
 
 <main>
     <% if(orders.length) { %>
-        <% orders.forEach(order => { %>
-            <h1>ORDER : <%= order.id %>  </h1>
-            <% console.log(order) %>
-            <ul>
-                <% order.products.forEach(item => { %>
-                    <li>
-                        <%= item.title %>(<%= item.orderItem.quantity %>)
-                    </li>
-                <% }); %>
-            </ul>
+    <% orders.forEach(order => { %>
+    <h1>ORDER : <%= order.id %> </h1>
+    <% console.log(order) %>
+    <ul>
+        <% order.products.forEach(item => { %>
+        <li>
+            <%= item.title %>(<%= item.quantity %>)
+        </li>
         <% }); %>
-    <% } else { %> 
-        <h1>No Orders yet!</h1>
-    <% } %>   
+    </ul>
+    <p>Total cost : <%= order.totalCost.toFixed(2) %></p>
+    <% }); %>
+    <% } else { %>
+    <h1>No Orders yet!</h1>
+    <% } %>
 </main>
 
 <%- include('../includes/end.ejs') %>
