@@ -89,8 +89,13 @@ postEditProduct = (req, res, next) => {
 
 postDeleteProduct = (req, res, next) => {
   const productId = req.body.productId;
+  const user = req.user;
+  const cart = user.cart;
 
   Product.deleteById(productId)
+    .then((data) => {
+      user.deleteProductFromCart(productId).then((cartDelete) => data);
+    })
     .then((data) => {
       console.log("Deleted data:", data);
       res.redirect("/");
