@@ -62,12 +62,33 @@ class User {
     };
     const db = getDb();
 
-    db.collection(mongoCollectionName).updateOne(
+    return db.collection(mongoCollectionName).updateOne(
       {
         _id: new mongoDb.ObjectID(this._id),
       },
       { $set: { cart } }
     );
+  }
+
+  deleteProductFromCart(productId) {
+    let cartItems;
+    if (this.cart && this.cart.items) {
+      cartItems = this.cart.items.filter(
+        (cp) => cp.productId.toString() !== productId.toString()
+      );
+
+      let cart = {
+        items: cartItems,
+      };
+
+      const db = getDb();
+      return db.collection(mongoCollectionName).updateOne(
+        {
+          _id: new mongoDb.ObjectID(this._id),
+        },
+        { $set: { cart } }
+      );
+    }
   }
 
   static findById(userId) {

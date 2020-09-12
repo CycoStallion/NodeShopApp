@@ -91,30 +91,29 @@ postProductToCart = (req, res, next) => {
   const productId = req.body.productId;
   const user = req.user;
 
-  Product.findById(productId).then((product) => {
-    user.saveItemsToCart(product._id);
-  });
+  Product.findById(productId)
+    .then((product) => {
+      return user.saveItemsToCart(product._id);
+    })
+    .then((result) => {
+      console.log(result);
+      res.redirect("/cart");
+    });
 };
 
 deleteProductFromCart = (req, res, next) => {
   let productId = req.params.productId;
+  const user = req.user;
 
-  req.user
-    .getCart()
-    .then((cart) => {
-      cart
-        .getProducts({
-          where: { id: productId },
-        })
-        .then((products) => {
-          let productToBeRemoved = products[0];
-          return cart.removeProduct(productToBeRemoved);
-        })
-        .then((data) => {
-          res.redirect("/cart");
-        });
-    })
-    .catch((err) => console.log(err));
+  Product.findById(productId).then((product) => {
+    user
+      .deleteProductFromCart(product._id)
+      .then((deletedData) => {
+        console.log(deletedData);
+        res.redirect("/cart");
+      })
+      .catch((err) => console.log(err));
+  });
 };
 
 getCheckout = (req, res, next) => {
