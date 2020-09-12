@@ -29,7 +29,7 @@ app.use((req, res, next) => {
   User.findById("5f47464ac00323c479deca07")
     .then((user) => {
       console.log("When saving to request(req): ", user);
-      req.user = user;
+      req.user = new User(user.name, user.email, user.cart, user._id);
       next();
     })
     .catch((err) => {

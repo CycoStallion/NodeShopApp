@@ -43,6 +43,16 @@ class Product {
       .catch((err) => console.log(err));
   }
 
+  static findByIds(productIds) {
+    const db = getDb();
+    return db
+      .collection(mongoCollectionName)
+      .find({ _id: { $in: productIds } })
+      .toArray()
+      .then((allProducts) => allProducts)
+      .catch((err) => console.error(err));
+  }
+
   static findById(productId) {
     const db = getDb();
     return db
