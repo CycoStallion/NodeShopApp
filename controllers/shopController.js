@@ -2,7 +2,7 @@ const Product = require("../models/product");
 const Order = require("../models/order");
 
 getProducts = (req, res, next) => {
-  Product.fetchAll()
+  Product.find()
     .then((products) => {
       res.render("shop/product-list", {
         products: products,
@@ -28,7 +28,7 @@ getProductDetails = (req, res, next) => {
 };
 
 getIndex = (req, res, next) => {
-  Product.fetchAll()
+  Product.find()
     .then((products) => {
       res.render("shop/index", {
         products: products,
@@ -92,42 +92,6 @@ getCart = (req, res, next) => {
   const cartProductIds = cart.items.map((cp) => {
     return cp.productId;
   });
-
-  /*
-  Product.findByIds(cartProductIds)
-    .then((products) => {
-      const cartProducts = [];
-      let totalPrice = 0;
-
-      if (products.length) {
-        products.forEach((product) => {
-          let cartItem = cart.items.find(
-            (cp) => cp.productId.toString() === product._id.toString()
-          );
-
-          cartProducts.push({
-            productData: product,
-            productPrice: cartItem.quantity * product.price,
-            quantity: cartItem.quantity,
-          });
-        });
-
-        let reducer = (acc, cur) => {
-          return acc + cur;
-        };
-
-        totalPrice = cartProducts.map((c) => c.productPrice).reduce(reducer);
-
-        res.render("shop/cart", {
-          pageTitle: "Your Cart",
-          activePath: "/cart",
-          products: cartProducts,
-          totalPrice: totalPrice,
-        }); //Render the cart view. Its path and format is already mentioned in the app.js configuration
-      }
-    })
-    .catch((err) => console.log(err));
-    */
 
   getCartInternals(cart.items)
     .then((cartInternals) => {

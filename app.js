@@ -2,7 +2,7 @@ const path = require("path");
 const express = require("express");
 const bodyParser = require("body-parser");
 const mongoose = require("mongoose");
-const User = require("./models/user");
+// const User = require("./models/user");
 
 const app = express();
 
@@ -24,18 +24,18 @@ app.set('views', path.join(__dirname, 'views', 'pug'));
 app.set("view engine", "ejs");
 app.set("views", path.join(__dirname, "views", "ejs"));
 
-//Load user - Store the dummy user in the req
-app.use((req, res, next) => {
-  User.findById("5f47464ac00323c479deca07")
-    .then((user) => {
-      console.log("When saving to request(req): ", user);
-      req.user = new User(user.name, user.email, user.cart, user._id);
-      next();
-    })
-    .catch((err) => {
-      console.log(err);
-    });
-});
+// //Load user - Store the dummy user in the req
+// app.use((req, res, next) => {
+//   User.findById("5f47464ac00323c479deca07")
+//     .then((user) => {
+//       console.log("When saving to request(req): ", user);
+//       req.user = new User(user.name, user.email, user.cart, user._id);
+//       next();
+//     })
+//     .catch((err) => {
+//       console.log(err);
+//     });
+// });
 
 //Load Routes
 app.use("/admin", adminRoutes);

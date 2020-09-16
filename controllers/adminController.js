@@ -1,7 +1,7 @@
 const Product = require("../models/product");
 
 getProducts = (req, res, next) => {
-  Product.fetchAll()
+  Product.find()
     .then((products) => {
       res.render("admin/products", {
         products: products,
@@ -25,17 +25,11 @@ postAddProduct = (req, res, next) => {
   const imageUrl = req.body.imageUrl;
   const price = +req.body.price;
   const description = req.body.description;
-  const userId = req.user._id;
+  // const userId = req.user._id;
 
-  const product = new Product(title, price, imageUrl, description, userId);
+  const product = new Product({ title, price, imageUrl, description });
   product
-    .save({
-      title: title,
-      price: price,
-      imageUrl: imageUrl,
-      description: description,
-      userId: userId,
-    })
+    .save()
     .then((result) => {
       res.redirect("/admin/products");
     })
