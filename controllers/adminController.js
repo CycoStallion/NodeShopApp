@@ -62,19 +62,9 @@ postEditProduct = (req, res, next) => {
   const imageUrl = req.body.imageUrl;
   const price = +req.body.price;
   const description = req.body.description;
-  const userId = req.user._id;
+  // const userId = req.user._id;
 
-  let product = new Product(
-    title,
-    price,
-    imageUrl,
-    description,
-    userId,
-    productId
-  );
-
-  product
-    .save()
+  Product.updateOne({ _id: productId }, { title, price, imageUrl, description })
     .then((updatedProduct) => {
       res.redirect("products");
     })
@@ -83,12 +73,13 @@ postEditProduct = (req, res, next) => {
 
 postDeleteProduct = (req, res, next) => {
   const productId = req.body.productId;
-  const user = req.user;
-  const cart = user.cart;
+  // const user = req.user;
+  // const cart = user.cart;
 
-  Product.deleteById(productId)
+  Product.deleteOne({ _id: productId })
     .then((data) => {
-      user.deleteProductFromCart(productId).then((cartDelete) => data);
+      // user.deleteProductFromCart(productId).then((cartDelete) => data);
+      return data;
     })
     .then((data) => {
       console.log("Deleted data:", data);
