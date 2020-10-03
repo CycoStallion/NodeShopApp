@@ -43,20 +43,12 @@ getCartInternals = (cartItems) => {
   const cartProducts = [];
   let totalPrice = 0;
 
-  const cartProductIds = cartItems.map((cp) => {
-    return cp.productId;
-  });
-
-  return Product.findByIds(cartProductIds).then((products) => {
-    if (products.length) {
-      products.forEach((product) => {
-        let cartItem = cartItems.find(
-          (cp) => cp.productId.toString() === product._id.toString()
-        );
-
+  return new Promise((resolve, reject) => {
+    if (cartItems.length) {
+      cartItems.forEach((cartItem) => {
         cartProducts.push({
-          productData: product,
-          productPrice: cartItem.quantity * product.price,
+          productData: cartItem.product,
+          productPrice: cartItem.quantity * cartItem.product.price,
           quantity: cartItem.quantity,
         });
       });
@@ -66,17 +58,12 @@ getCartInternals = (cartItems) => {
       };
 
       totalPrice = cartProducts.map((c) => c.productPrice).reduce(reducer);
-
-      return {
-        cartProducts,
-        totalPrice,
-      };
     }
 
-    return {
+    resolve({
       cartProducts,
       totalPrice,
-    };
+    });
   });
 };
 
@@ -93,18 +80,24 @@ getCart = (req, res, next) => {
     return cp.productId;
   });
 
-  getCartInternals(cart.items)
-    .then((cartInternals) => {
-      const { cartProducts, totalPrice } = cartInternals;
+  user
+    .populate({ path: "cart.items.product" })
+    .execPopulate()
+    .then((product) => {
+      console.log("execPopulate : ", product.cart.items);
+      getCartInternals(product.cart.items)
+        .then((cartInternals) => {
+          const { cartProducts, totalPrice } = cartInternals;
 
-      res.render("shop/cart", {
-        pageTitle: "Your Cart",
-        activePath: "/cart",
-        products: cartProducts,
-        totalPrice: totalPrice,
-      }); //Render the cart view. Its path and format is already mentioned in the app.js configuration
-    })
-    .catch((err) => console.log(err));
+          res.render("shop/cart", {
+            pageTitle: "Your Cart",
+            activePath: "/cart",
+            products: cartProducts,
+            totalPrice: totalPrice,
+          }); //Render the cart view. Its path and format is already mentioned in the app.js configuration
+        })
+        .catch((err) => console.log(err));
+    });
 };
 
 postProductToCart = (req, res, next) => {
@@ -113,7 +106,7 @@ postProductToCart = (req, res, next) => {
 
   Product.findById(productId)
     .then((product) => {
-      return user.saveItemsToCart(product._id);
+      return user.saveItemToCart(product._id);
     })
     .then((result) => {
       console.log(result);
@@ -125,15 +118,13 @@ deleteProductFromCart = (req, res, next) => {
   let productId = req.params.productId;
   const user = req.user;
 
-  Product.findById(productId).then((product) => {
-    user
-      .deleteProductFromCart(product._id)
-      .then((deletedData) => {
-        console.log(deletedData);
-        res.redirect("/cart");
-      })
-      .catch((err) => console.log(err));
-  });
+  user
+    .removeItemFromCart(productId)
+    .then((deletedData) => {
+      console.log(deletedData);
+      res.redirect("/cart");
+    })
+    .catch((err) => console.log(err));
 };
 
 getCheckout = (req, res, next) => {

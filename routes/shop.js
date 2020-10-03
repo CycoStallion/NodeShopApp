@@ -20,11 +20,11 @@ router.get("/products", getProducts);
 
 router.get("/product-details/:productId", getProductDetails);
 
-// router.get("/cart-item-delete/:productId", deleteProductFromCart);
+router.get("/cart-item-delete/:productId", deleteProductFromCart);
 
-// router.get("/cart", getCart);
+router.get("/cart", getCart);
 
-// router.post("/cart", postProductToCart);
+router.post("/cart", postProductToCart);
 
 // router.get("/orders", getOrders);
 

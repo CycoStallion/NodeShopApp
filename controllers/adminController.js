@@ -2,6 +2,7 @@ const Product = require("../models/product");
 
 getProducts = (req, res, next) => {
   Product.find()
+    .populate("userId")
     .then((products) => {
       res.render("admin/products", {
         products: products,
@@ -25,9 +26,9 @@ postAddProduct = (req, res, next) => {
   const imageUrl = req.body.imageUrl;
   const price = +req.body.price;
   const description = req.body.description;
-  // const userId = req.user._id;
+  const userId = req.user._id;
 
-  const product = new Product({ title, price, imageUrl, description });
+  const product = new Product({ title, price, imageUrl, description, userId });
   product
     .save()
     .then((result) => {
@@ -62,9 +63,12 @@ postEditProduct = (req, res, next) => {
   const imageUrl = req.body.imageUrl;
   const price = +req.body.price;
   const description = req.body.description;
-  // const userId = req.user._id;
+  const userId = req.user._id;
 
-  Product.updateOne({ _id: productId }, { title, price, imageUrl, description })
+  Product.updateOne(
+    { _id: productId },
+    { title, price, imageUrl, description, userId }
+  )
     .then((updatedProduct) => {
       res.redirect("products");
     })
@@ -73,7 +77,7 @@ postEditProduct = (req, res, next) => {
 
 postDeleteProduct = (req, res, next) => {
   const productId = req.body.productId;
-  // const user = req.user;
+  const user = req.user;
   // const cart = user.cart;
 
   Product.deleteOne({ _id: productId })
