@@ -7,6 +7,7 @@ const User = require("./models/user");
 const app = express();
 
 const adminRoutes = require("./routes/admin");
+const authRoutes = require("./routes/auth");
 const shopRoutes = require("./routes/shop");
 
 const pageNotFound = require("./controllers/404Controller");
@@ -40,6 +41,7 @@ app.use((req, res, next) => {
 //Load Routes
 app.use("/admin", adminRoutes);
 app.use(shopRoutes);
+app.use(authRoutes);
 
 //Custom Middleware
 app.use((req, res, next) => {
