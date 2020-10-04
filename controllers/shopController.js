@@ -2,7 +2,7 @@ const Product = require("../models/product");
 const Order = require("../models/order");
 
 getProducts = (req, res, next) => {
-  Product.find()
+  Product.find({ isDeleted: false })
     .then((products) => {
       res.render("shop/product-list", {
         products: products,
@@ -16,7 +16,7 @@ getProducts = (req, res, next) => {
 getProductDetails = (req, res, next) => {
   const productId = req.params.productId;
 
-  Product.findById(productId)
+  Product.findOne({ _id: productId, isDeleted: false })
     .then((product) => {
       res.render("shop/product-details", {
         product: product,
@@ -28,7 +28,7 @@ getProductDetails = (req, res, next) => {
 };
 
 getIndex = (req, res, next) => {
-  Product.find()
+  Product.find({ isDeleted: false })
     .then((products) => {
       res.render("shop/index", {
         products: products,
@@ -47,7 +47,7 @@ getCartInternals = (cartItems) => {
     if (cartItems.length) {
       cartItems.forEach((cartItem) => {
         cartProducts.push({
-          productData: cartItem.product,
+          productData: cartItem.product.toObject(),
           productPrice: cartItem.quantity * cartItem.product.price,
           quantity: cartItem.quantity,
         });
@@ -76,15 +76,10 @@ getCart = (req, res, next) => {
     return [];
   }
 
-  const cartProductIds = cart.items.map((cp) => {
-    return cp.productId;
-  });
-
   user
     .populate({ path: "cart.items.product" })
     .execPopulate()
     .then((product) => {
-      console.log("execPopulate : ", product.cart.items);
       getCartInternals(product.cart.items)
         .then((cartInternals) => {
           const { cartProducts, totalPrice } = cartInternals;
@@ -104,12 +99,11 @@ postProductToCart = (req, res, next) => {
   const productId = req.body.productId;
   const user = req.user;
 
-  Product.findById(productId)
+  Product.findOne({ _id: productId, isDeleted: false })
     .then((product) => {
       return user.saveItemToCart(product._id);
     })
     .then((result) => {
-      console.log(result);
       res.redirect("/cart");
     });
 };
@@ -121,7 +115,6 @@ deleteProductFromCart = (req, res, next) => {
   user
     .removeItemFromCart(productId)
     .then((deletedData) => {
-      console.log(deletedData);
       res.redirect("/cart");
     })
     .catch((err) => console.log(err));
@@ -168,22 +161,31 @@ getOrders = (req, res, next) => {
 postOrder = (req, res, next) => {
   const user = req.user;
   const cart = user.cart;
-  let cartProducts;
 
   if (cart && cart.items) {
-    let order = new Order(user._id, cart.items, 0);
+    user
+      .populate({ path: "cart.items.product" })
+      .execPopulate()
+      .then((product) => {
+        getCartInternals(product.cart.items)
+          .then((cartInternals) => {
+            const { cartProducts, totalPrice } = cartInternals;
 
-    getCartInternals(cart.items)
-      .then((cartInternals) => {
-        const { cartProducts, totalPrice } = cartInternals;
-        order.productDetails = cartProducts;
-        order.totalCost = totalPrice;
+            const userId = user._id;
 
-        order.addProducts().then((order) => {
-          res.redirect("/orders");
-        });
-      })
-      .catch((err) => console.log(err));
+            let order = new Order({
+              user: userId,
+              productDetails: [...cartProducts],
+              totalCost: totalPrice,
+            });
+
+            order.save().then((order) => {
+              user.emptyCart();
+              res.redirect("/orders");
+            });
+          })
+          .catch((err) => console.log(err));
+      });
   }
 };
 

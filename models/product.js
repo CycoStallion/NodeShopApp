@@ -18,6 +18,7 @@ const productSchema = new Schema({
     type: Number,
     required: true,
   },
+  isDeleted: { type: Boolean, default: false },
   userId: {
     type: Schema.Types.ObjectId,
     ref: "User",

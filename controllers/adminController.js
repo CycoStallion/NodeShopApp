@@ -1,7 +1,7 @@
 const Product = require("../models/product");
 
 getProducts = (req, res, next) => {
-  Product.find()
+  Product.find({ isDeleted: false })
     .populate("userId")
     .then((products) => {
       res.render("admin/products", {
@@ -40,7 +40,7 @@ postAddProduct = (req, res, next) => {
 getEditProduct = (req, res, next) => {
   const productId = req.params.productId;
 
-  Product.findById(productId)
+  Product.findOne({ _id: productId, isDeleted: false })
     .then((product) => {
       if (!product) {
         return res.redirect("/notFound");
@@ -80,7 +80,7 @@ postDeleteProduct = (req, res, next) => {
   const user = req.user;
   // const cart = user.cart;
 
-  Product.deleteOne({ _id: productId })
+  Product.updateOne({ _id: productId }, { isDeleted: true })
     .then((data) => {
       // user.deleteProductFromCart(productId).then((cartDelete) => data);
       return data;

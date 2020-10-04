@@ -10,7 +10,6 @@
     <% if(orders.length) { %>
     <% orders.forEach(order => { %>
     <h1>ORDER : <%= order.id %> </h1>
-    <% console.log(order) %>
     <ul>
         <% order.products.forEach(item => { %>
         <li>

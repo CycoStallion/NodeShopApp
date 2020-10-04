@@ -39,6 +39,11 @@ userSchema.methods.removeItemFromCart = function (productId) {
   }
 };
 
+userSchema.methods.emptyCart = function () {
+  this.cart.items = [];
+  return this.save();
+};
+
 userSchema.methods.saveItemToCart = function (productId) {
   let newQuantity = 1;
   let cartItems = [{ product: productId, quantity: newQuantity }];
