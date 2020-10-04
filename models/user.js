@@ -1,3 +1,79 @@
+const mongoose = require("mongoose");
+const Schema = mongoose.Schema;
+
+const mongooseModelName = "User";
+
+const userSchema = new Schema({
+  name: {
+    type: String,
+    required: true,
+  },
+  email: {
+    type: String,
+    required: true,
+  },
+  cart: {
+    items: [
+      {
+        product: {
+          type: Schema.Types.ObjectId,
+          ref: "Product",
+          required: true,
+        },
+        quantity: { type: Number, required: true },
+      },
+    ],
+  },
+});
+
+userSchema.methods.removeItemFromCart = function (productId) {
+  let cartItems;
+  if (this.cart && this.cart.items) {
+    cartItems = this.cart.items.filter(
+      (cp) => cp.product.toString() !== productId.toString()
+    );
+
+    this.cart.items = cartItems;
+
+    return this.save();
+  }
+};
+
+userSchema.methods.emptyCart = function () {
+  this.cart.items = [];
+  return this.save();
+};
+
+userSchema.methods.saveItemToCart = function (productId) {
+  let newQuantity = 1;
+  let cartItems = [{ product: productId, quantity: newQuantity }];
+
+  if (this.cart && this.cart.items) {
+    //A cart with some items is found, lets search the product here
+    const existingProductIndex = this.cart.items.findIndex((cp) => {
+      return cp.product.toString() === productId.toString();
+    });
+
+    if (existingProductIndex > -1) {
+      //If product is found, increase its quantity
+      ++this.cart.items[existingProductIndex].quantity;
+    } else {
+      //This is a new product, then add it to the cart
+      this.cart.items.push({
+        product: productId,
+        quantity: newQuantity,
+      });
+    }
+
+    cartItems = [...this.cart.items];
+  }
+
+  return this.save();
+};
+
+module.exports = mongoose.model(mongooseModelName, userSchema);
+
+/*
 const mongoDb = require("mongodb");
 const { getDb } = require("../utils/database");
 
@@ -105,3 +181,4 @@ class User {
 }
 
 module.exports = User;
+*/

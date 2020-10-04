@@ -2,7 +2,7 @@ const Product = require("../models/product");
 const Order = require("../models/order");
 
 getProducts = (req, res, next) => {
-  Product.fetchAll()
+  Product.find({ isDeleted: false })
     .then((products) => {
       res.render("shop/product-list", {
         products: products,
@@ -16,7 +16,7 @@ getProducts = (req, res, next) => {
 getProductDetails = (req, res, next) => {
   const productId = req.params.productId;
 
-  Product.findById(productId)
+  Product.findOne({ _id: productId, isDeleted: false })
     .then((product) => {
       res.render("shop/product-details", {
         product: product,
@@ -28,7 +28,7 @@ getProductDetails = (req, res, next) => {
 };
 
 getIndex = (req, res, next) => {
-  Product.fetchAll()
+  Product.find({ isDeleted: false })
     .then((products) => {
       res.render("shop/index", {
         products: products,
@@ -43,20 +43,12 @@ getCartInternals = (cartItems) => {
   const cartProducts = [];
   let totalPrice = 0;
 
-  const cartProductIds = cartItems.map((cp) => {
-    return cp.productId;
-  });
-
-  return Product.findByIds(cartProductIds).then((products) => {
-    if (products.length) {
-      products.forEach((product) => {
-        let cartItem = cartItems.find(
-          (cp) => cp.productId.toString() === product._id.toString()
-        );
-
+  return new Promise((resolve, reject) => {
+    if (cartItems.length) {
+      cartItems.forEach((cartItem) => {
         cartProducts.push({
-          productData: product,
-          productPrice: cartItem.quantity * product.price,
+          productData: cartItem.product.toObject(),
+          productPrice: cartItem.quantity * cartItem.product.price,
           quantity: cartItem.quantity,
         });
       });
@@ -66,17 +58,12 @@ getCartInternals = (cartItems) => {
       };
 
       totalPrice = cartProducts.map((c) => c.productPrice).reduce(reducer);
-
-      return {
-        cartProducts,
-        totalPrice,
-      };
     }
 
-    return {
+    resolve({
       cartProducts,
       totalPrice,
-    };
+    });
   });
 };
 
@@ -89,70 +76,34 @@ getCart = (req, res, next) => {
     return [];
   }
 
-  const cartProductIds = cart.items.map((cp) => {
-    return cp.productId;
-  });
+  user
+    .populate({ path: "cart.items.product" })
+    .execPopulate()
+    .then((product) => {
+      getCartInternals(product.cart.items)
+        .then((cartInternals) => {
+          const { cartProducts, totalPrice } = cartInternals;
 
-  /*
-  Product.findByIds(cartProductIds)
-    .then((products) => {
-      const cartProducts = [];
-      let totalPrice = 0;
-
-      if (products.length) {
-        products.forEach((product) => {
-          let cartItem = cart.items.find(
-            (cp) => cp.productId.toString() === product._id.toString()
-          );
-
-          cartProducts.push({
-            productData: product,
-            productPrice: cartItem.quantity * product.price,
-            quantity: cartItem.quantity,
-          });
-        });
-
-        let reducer = (acc, cur) => {
-          return acc + cur;
-        };
-
-        totalPrice = cartProducts.map((c) => c.productPrice).reduce(reducer);
-
-        res.render("shop/cart", {
-          pageTitle: "Your Cart",
-          activePath: "/cart",
-          products: cartProducts,
-          totalPrice: totalPrice,
-        }); //Render the cart view. Its path and format is already mentioned in the app.js configuration
-      }
-    })
-    .catch((err) => console.log(err));
-    */
-
-  getCartInternals(cart.items)
-    .then((cartInternals) => {
-      const { cartProducts, totalPrice } = cartInternals;
-
-      res.render("shop/cart", {
-        pageTitle: "Your Cart",
-        activePath: "/cart",
-        products: cartProducts,
-        totalPrice: totalPrice,
-      }); //Render the cart view. Its path and format is already mentioned in the app.js configuration
-    })
-    .catch((err) => console.log(err));
+          res.render("shop/cart", {
+            pageTitle: "Your Cart",
+            activePath: "/cart",
+            products: cartProducts,
+            totalPrice: totalPrice,
+          }); //Render the cart view. Its path and format is already mentioned in the app.js configuration
+        })
+        .catch((err) => console.log(err));
+    });
 };
 
 postProductToCart = (req, res, next) => {
   const productId = req.body.productId;
   const user = req.user;
 
-  Product.findById(productId)
+  Product.findOne({ _id: productId, isDeleted: false })
     .then((product) => {
-      return user.saveItemsToCart(product._id);
+      return user.saveItemToCart(product._id);
     })
     .then((result) => {
-      console.log(result);
       res.redirect("/cart");
     });
 };
@@ -161,15 +112,12 @@ deleteProductFromCart = (req, res, next) => {
   let productId = req.params.productId;
   const user = req.user;
 
-  Product.findById(productId).then((product) => {
-    user
-      .deleteProductFromCart(product._id)
-      .then((deletedData) => {
-        console.log(deletedData);
-        res.redirect("/cart");
-      })
-      .catch((err) => console.log(err));
-  });
+  user
+    .removeItemFromCart(productId)
+    .then((deletedData) => {
+      res.redirect("/cart");
+    })
+    .catch((err) => console.log(err));
 };
 
 getCheckout = (req, res, next) => {
@@ -213,22 +161,31 @@ getOrders = (req, res, next) => {
 postOrder = (req, res, next) => {
   const user = req.user;
   const cart = user.cart;
-  let cartProducts;
 
   if (cart && cart.items) {
-    let order = new Order(user._id, cart.items, 0);
+    user
+      .populate({ path: "cart.items.product" })
+      .execPopulate()
+      .then((product) => {
+        getCartInternals(product.cart.items)
+          .then((cartInternals) => {
+            const { cartProducts, totalPrice } = cartInternals;
 
-    getCartInternals(cart.items)
-      .then((cartInternals) => {
-        const { cartProducts, totalPrice } = cartInternals;
-        order.productDetails = cartProducts;
-        order.totalCost = totalPrice;
+            const userId = user._id;
 
-        order.addProducts().then((order) => {
-          res.redirect("/orders");
-        });
-      })
-      .catch((err) => console.log(err));
+            let order = new Order({
+              user: userId,
+              productDetails: [...cartProducts],
+              totalCost: totalPrice,
+            });
+
+            order.save().then((order) => {
+              user.emptyCart();
+              res.redirect("/orders");
+            });
+          })
+          .catch((err) => console.log(err));
+      });
   }
 };
 

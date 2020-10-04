@@ -1,7 +1,7 @@
 const path = require("path");
 const express = require("express");
 const bodyParser = require("body-parser");
-const { mongoConnect } = require("./utils/database");
+const mongoose = require("mongoose");
 const User = require("./models/user");
 
 const app = express();
@@ -29,7 +29,7 @@ app.use((req, res, next) => {
   User.findById("5f47464ac00323c479deca07")
     .then((user) => {
       console.log("When saving to request(req): ", user);
-      req.user = new User(user.name, user.email, user.cart, user._id);
+      req.user = user;
       next();
     })
     .catch((err) => {
@@ -50,10 +50,29 @@ app.use((req, res, next) => {
 
 app.use(pageNotFound);
 
-mongoConnect(() => {
-  app.listen(3000);
-  console.log("Listening to requests on port 3000");
-});
+mongoose
+  .connect(
+    "mongodb+srv://developer:Develop123@developmentdbcluster.vzz8j.mongodb.net/NodeShopApplication?retryWrites=true&w=majority",
+    { useUnifiedTopology: true, useNewUrlParser: true }
+  )
+  .then((result) => {
+    User.findOne().then((user) => {
+      if (!user) {
+        var newUser = new User({
+          name: "Shantanu",
+          email: "test@test.com",
+          cart: { items: [] },
+        });
 
-//Using express -> app.listen, which means we wont require 'http' any more
-// app.listen(3000);
+        newUser.save();
+      }
+    });
+
+    app.listen(3000);
+    console.log(
+      "Listening to requests on port 3000, using mongoose for db connection"
+    );
+  })
+  .catch((err) =>
+    console.error("Errored while connecting to mongodb using mongoose")
+  );

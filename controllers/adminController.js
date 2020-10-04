@@ -1,7 +1,8 @@
 const Product = require("../models/product");
 
 getProducts = (req, res, next) => {
-  Product.fetchAll()
+  Product.find({ isDeleted: false })
+    .populate("userId")
     .then((products) => {
       res.render("admin/products", {
         products: products,
@@ -27,15 +28,9 @@ postAddProduct = (req, res, next) => {
   const description = req.body.description;
   const userId = req.user._id;
 
-  const product = new Product(title, price, imageUrl, description, userId);
+  const product = new Product({ title, price, imageUrl, description, userId });
   product
-    .save({
-      title: title,
-      price: price,
-      imageUrl: imageUrl,
-      description: description,
-      userId: userId,
-    })
+    .save()
     .then((result) => {
       res.redirect("/admin/products");
     })
@@ -45,7 +40,7 @@ postAddProduct = (req, res, next) => {
 getEditProduct = (req, res, next) => {
   const productId = req.params.productId;
 
-  Product.findById(productId)
+  Product.findOne({ _id: productId, isDeleted: false })
     .then((product) => {
       if (!product) {
         return res.redirect("/notFound");
@@ -70,17 +65,10 @@ postEditProduct = (req, res, next) => {
   const description = req.body.description;
   const userId = req.user._id;
 
-  let product = new Product(
-    title,
-    price,
-    imageUrl,
-    description,
-    userId,
-    productId
-  );
-
-  product
-    .save()
+  Product.updateOne(
+    { _id: productId },
+    { title, price, imageUrl, description, userId }
+  )
     .then((updatedProduct) => {
       res.redirect("products");
     })
@@ -90,11 +78,12 @@ postEditProduct = (req, res, next) => {
 postDeleteProduct = (req, res, next) => {
   const productId = req.body.productId;
   const user = req.user;
-  const cart = user.cart;
+  // const cart = user.cart;
 
-  Product.deleteById(productId)
+  Product.updateOne({ _id: productId }, { isDeleted: true })
     .then((data) => {
-      user.deleteProductFromCart(productId).then((cartDelete) => data);
+      // user.deleteProductFromCart(productId).then((cartDelete) => data);
+      return data;
     })
     .then((data) => {
       console.log("Deleted data:", data);
