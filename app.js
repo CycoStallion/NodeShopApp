@@ -2,6 +2,7 @@ const path = require("path");
 const express = require("express");
 const bodyParser = require("body-parser");
 const mongoose = require("mongoose");
+const session = require("express-session");
 const User = require("./models/user");
 
 const app = express();
@@ -15,6 +16,9 @@ const pageNotFound = require("./controllers/404Controller");
 //BodyParser
 app.use(bodyParser.urlencoded({ extended: true }));
 app.use(express.static(path.join(__dirname, "public")));
+app.use(
+  session({ secret: "MySecret", resave: false, saveUninitialized: false })
+);
 
 //Defining the view engine for express and explicitly mention the views folder to be used
 /* //For pug
