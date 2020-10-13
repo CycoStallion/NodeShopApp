@@ -1,4 +1,3 @@
-const { ReplSet } = require("mongodb");
 const User = require("../models/user");
 
 exports.login = (req, res, next) => {
@@ -35,3 +34,12 @@ exports.logout = (req, res, next) => {
     res.redirect("/");
   });
 };
+
+exports.signup = (req, res, next) => {
+  res.render("auth/signup", {
+    pageTitle: "Sign Up",
+    activePath: "/signup",
+  });
+};
+
+exports.postSignup = (req, res, next) => {};
