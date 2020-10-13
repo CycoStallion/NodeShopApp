@@ -69,11 +69,15 @@ getCartInternals = (cartItems) => {
 
 getCart = (req, res, next) => {
   const user = req.user;
-
   const cart = user.cart;
 
-  if (!(cart && cart.items)) {
-    return [];
+  if (!(cart && cart.items.length)) {
+    res.render("shop/cart", {
+      pageTitle: "Your Cart",
+      activePath: "/cart",
+      products: [],
+      totalPrice: 0,
+    });
   }
 
   user

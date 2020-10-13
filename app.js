@@ -2,18 +2,49 @@ const path = require("path");
 const express = require("express");
 const bodyParser = require("body-parser");
 const mongoose = require("mongoose");
+const session = require("express-session");
+var MongoDBStore = require("connect-mongodb-session")(session);
 const User = require("./models/user");
 
 const app = express();
 
 const adminRoutes = require("./routes/admin");
+const authRoutes = require("./routes/auth");
 const shopRoutes = require("./routes/shop");
 
 const pageNotFound = require("./controllers/404Controller");
 
+const MONGO_URI =
+  "mongodb+srv://developer:Develop123@developmentdbcluster.vzz8j.mongodb.net/NodeShopApplication?retryWrites=true&w=majority";
+const store = new MongoDBStore({
+  uri: MONGO_URI,
+  collection: "ShopSessions",
+
+  // By default, sessions expire after 2 weeks. The `expires` option lets
+  // you overwrite that by setting the expiration in milliseconds
+  expires: 1000 * 60 * 60, // 1 hour in milliseconds
+
+  // Lets you set options passed to `MongoClient.connect()`. Useful for
+  // configuring connectivity or working around deprecation warnings.
+  connectionOptions: {
+    useNewUrlParser: true,
+    useUnifiedTopology: true,
+    serverSelectionTimeoutMS: 10000,
+  },
+});
+
 //BodyParser
 app.use(bodyParser.urlencoded({ extended: true }));
 app.use(express.static(path.join(__dirname, "public")));
+app.use(
+  session({
+    secret: "MySecret",
+    resave: false,
+    saveUninitialized: false,
+    store: store,
+    cookie: { maxAge: 1000 * 60 * 60 }, //To keep the cookie in the browser inspite of browser closing
+  })
+);
 
 //Defining the view engine for express and explicitly mention the views folder to be used
 /* //For pug
@@ -26,20 +57,31 @@ app.set("views", path.join(__dirname, "views", "ejs"));
 
 //Load user - Store the dummy user in the req
 app.use((req, res, next) => {
-  User.findById("5f47464ac00323c479deca07")
-    .then((user) => {
-      console.log("When saving to request(req): ", user);
-      req.user = user;
-      next();
-    })
-    .catch((err) => {
-      console.log(err);
-    });
+  res.locals.isLoggedIn = req.session.isLoggedIn;
+  console.log(
+    "Trying to load the user from session ",
+    req.session,
+    req.session.user
+  );
+  if (req.session && req.session.user) {
+    User.findById(req.session.user._id)
+      .then((user) => {
+        console.log("When saving to request(req): ", user);
+        req.user = user;
+        next();
+      })
+      .catch((err) => {
+        console.log(err);
+      });
+  } else {
+    next();
+  }
 });
 
 //Load Routes
 app.use("/admin", adminRoutes);
 app.use(shopRoutes);
+app.use(authRoutes);
 
 //Custom Middleware
 app.use((req, res, next) => {
@@ -51,10 +93,7 @@ app.use((req, res, next) => {
 app.use(pageNotFound);
 
 mongoose
-  .connect(
-    "mongodb+srv://developer:Develop123@developmentdbcluster.vzz8j.mongodb.net/NodeShopApplication?retryWrites=true&w=majority",
-    { useUnifiedTopology: true, useNewUrlParser: true }
-  )
+  .connect(MONGO_URI, { useUnifiedTopology: true, useNewUrlParser: true })
   .then((result) => {
     User.findOne().then((user) => {
       if (!user) {
