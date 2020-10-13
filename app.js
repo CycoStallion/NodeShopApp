@@ -42,6 +42,7 @@ app.use(
     resave: false,
     saveUninitialized: false,
     store: store,
+    cookie: { maxAge: 1000 * 60 * 60 }, //To keep the cookie in the browser inspite of browser closing
   })
 );
 
@@ -56,15 +57,25 @@ app.set("views", path.join(__dirname, "views", "ejs"));
 
 //Load user - Store the dummy user in the req
 app.use((req, res, next) => {
-  User.findById("5f47464ac00323c479deca07")
-    .then((user) => {
-      console.log("When saving to request(req): ", user);
-      req.user = user;
-      next();
-    })
-    .catch((err) => {
-      console.log(err);
-    });
+  res.locals.isLoggedIn = req.session.isLoggedIn;
+  console.log(
+    "Trying to load the user from session ",
+    req.session,
+    req.session.user
+  );
+  if (req.session && req.session.user) {
+    User.findById(req.session.user._id)
+      .then((user) => {
+        console.log("When saving to request(req): ", user);
+        req.user = user;
+        next();
+      })
+      .catch((err) => {
+        console.log(err);
+      });
+  } else {
+    next();
+  }
 });
 
 //Load Routes
