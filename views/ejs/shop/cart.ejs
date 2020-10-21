@@ -13,6 +13,7 @@
         <li class="cart__item">
             <h1><%= prod.productData.title %>[<%= prod.quantity %>]</h1>
             <h2>Price: <%= prod.productPrice %></h2>
+            <input type="hidden" name="_csrf" value="<%= csrfToken %>" />
             <a href="/cart-item-delete/<%= prod.productData._id %>" class="btn danger">&times;</a>
         </li>
 
@@ -21,6 +22,7 @@
     <p class="centered">Total Cost : <%= totalPrice.toFixed(2) %></p>
     <div class="centered">
         <form action="/create-order" method="post">
+            <input type="hidden" name="_csrf" value="<%= csrfToken %>" />
             <button type="submit" class="btn success">Order Now!</button>
         </form>
     </div>

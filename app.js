@@ -3,10 +3,14 @@ const express = require("express");
 const bodyParser = require("body-parser");
 const mongoose = require("mongoose");
 const session = require("express-session");
+const csrf = require("csurf");
+
 var MongoDBStore = require("connect-mongodb-session")(session);
 const User = require("./models/user");
 const Auth = require("./middleware/authMiddleware");
 const { CLOSED_PATHS } = require("./constants/pathNames");
+
+var csrfProtection = csrf();
 
 const app = express();
 
@@ -15,7 +19,6 @@ const authRoutes = require("./routes/auth");
 const shopRoutes = require("./routes/shop");
 
 const pageNotFound = require("./controllers/404Controller");
-const authMiddleware = require("./middleware/authMiddleware");
 
 const MONGO_URI =
   "mongodb+srv://developer:Develop123@developmentdbcluster.vzz8j.mongodb.net/NodeShopApplication?retryWrites=true&w=majority";
@@ -58,8 +61,11 @@ app.set('views', path.join(__dirname, 'views', 'pug'));
 app.set("view engine", "ejs");
 app.set("views", path.join(__dirname, "views", "ejs"));
 
+app.use(csrfProtection);
+
 //Load user - Store the dummy user in the req
 app.use((req, res, next) => {
+  res.locals.csrfToken = req.csrfToken();
   res.locals.isLoggedIn = req.session.isLoggedIn;
   console.log(
     "Trying to load the user from session ",
@@ -81,6 +87,7 @@ app.use((req, res, next) => {
   }
 });
 
+//Use authentication to access these paths. If not logged in then redirect to Login page
 app.use([CLOSED_PATHS], Auth);
 
 //Load Routes

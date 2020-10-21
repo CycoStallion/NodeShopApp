@@ -30,7 +30,7 @@
             <input type="number" name="price" id="price" step="0.01"
                 value="<%= (locals.product)? product.price : null %>">
         </div>
-
+        <input type="hidden" name="_csrf" value="<%= csrfToken %>" />
         <button class="btn" type="submit"><%= (locals.product)? 'Update Product' : 'Add Product' %></button>
     </form>
 </main>
