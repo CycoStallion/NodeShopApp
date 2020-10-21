@@ -1,4 +1,13 @@
 const express = require("express");
+const {
+  ROOT,
+  PRODUCTS,
+  PRODUCT_DETAILS,
+  DELETE_CART_ITEM_PRODUCTID,
+  CART,
+  ORDERS,
+  CREATE_ORDER,
+} = require("../constants/pathNames");
 
 const router = express.Router();
 
@@ -14,21 +23,21 @@ const {
   postOrder,
 } = require("../controllers/shopController");
 
-router.get("/", getIndex);
+router.get(ROOT, getIndex);
 
-router.get("/products", getProducts);
+router.get(PRODUCTS, getProducts);
 
-router.get("/product-details/:productId", getProductDetails);
+router.get(PRODUCT_DETAILS, getProductDetails);
 
-router.get("/cart-item-delete/:productId", deleteProductFromCart);
+router.get(DELETE_CART_ITEM_PRODUCTID, deleteProductFromCart);
 
-router.get("/cart", getCart);
+router.get(CART, getCart);
 
-router.post("/cart", postProductToCart);
+router.post(CART, postProductToCart);
 
-router.get("/orders", getOrders);
+router.get(ORDERS, getOrders);
 
-router.post("/create-order", postOrder);
+router.post(CREATE_ORDER, postOrder);
 
 // // router.get("/checkout", getCheckout);
 

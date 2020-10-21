@@ -5,6 +5,8 @@ const mongoose = require("mongoose");
 const session = require("express-session");
 var MongoDBStore = require("connect-mongodb-session")(session);
 const User = require("./models/user");
+const Auth = require("./middleware/authMiddleware");
+const { CLOSED_PATHS } = require("./constants/pathNames");
 
 const app = express();
 
@@ -13,6 +15,7 @@ const authRoutes = require("./routes/auth");
 const shopRoutes = require("./routes/shop");
 
 const pageNotFound = require("./controllers/404Controller");
+const authMiddleware = require("./middleware/authMiddleware");
 
 const MONGO_URI =
   "mongodb+srv://developer:Develop123@developmentdbcluster.vzz8j.mongodb.net/NodeShopApplication?retryWrites=true&w=majority";
@@ -78,8 +81,10 @@ app.use((req, res, next) => {
   }
 });
 
+app.use([CLOSED_PATHS], Auth);
+
 //Load Routes
-app.use("/admin", adminRoutes);
+app.use(adminRoutes);
 app.use(shopRoutes);
 app.use(authRoutes);
 
@@ -95,18 +100,6 @@ app.use(pageNotFound);
 mongoose
   .connect(MONGO_URI, { useUnifiedTopology: true, useNewUrlParser: true })
   .then((result) => {
-    User.findOne().then((user) => {
-      if (!user) {
-        var newUser = new User({
-          name: "Shantanu",
-          email: "test@test.com",
-          cart: { items: [] },
-        });
-
-        newUser.save();
-      }
-    });
-
     app.listen(3000);
     console.log(
       "Listening to requests on port 3000, using mongoose for db connection"
